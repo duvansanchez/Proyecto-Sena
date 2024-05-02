@@ -1,0 +1,4 @@
+Averiguar si hay alguna forma mas optima de herederar estilos   
+
+- Todos los elementos de entrada (input y demas) deben de tener el atributo name o si no no seran enviadas en el cuerpo del HTTP
+- Las funciones que se ejecutan en el JS deben de retornar un false para que el contenido interno se ejecute

@@ -1,0 +1,23 @@
+/* <link rel="stylesheet" href="/Login Salud/entorno/static/css/usuario.css">
+<link rel="stylesheet" href="/Login Salud/entorno/static/css/base.css"> */
+body{
+    display: flex;
+    flex-direction: column;
+}
+form{
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+#error{
+    float: right;
+    max-width: 200px;
+    background-color: rgb(0, 183, 255);
+    color: rgb(255, 255, 255);
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+#boton-cerrar{
+    display: none;
+}

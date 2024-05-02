@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacientes</title>
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/pacientes.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pacientes.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        let campos = {{ lista_de_campos | tojson }};
+        console.log(campos)
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div id="error"></div>
+
+    <div class="content-titulo">
+        <h1 class="titulo">Pacientes</h1>
+    </div>
+    <div class="content-regis">
+        <form action="/pacientes" method="post" onsubmit="return validarContenido(campos)">
+            <div class="inputs">
+                <input class="button-login-regis" id="nombre" name="nombre" type="text" placeholder="Nombre"  minlength="3" >  
+                <input class="button-login-regis" id="apellidos" name="apellidos"  type="text" placeholder="Apellidos"  minlength="5" >   
+                <input class="button-login-regis" id="tipo_identificacion" name="tipo_identificacion" type="text" placeholder="Tipo Identificacion">
+                <div class="content-email">
+                    <input class="button-login-regis" id="cedula" name="cedula" type="text" placeholder="Cedula"  minlength="3" >
+                </div>
+                <input class="button-login-regis" id="telefono" name="telefono" type="text" placeholder="Telefono - Celular">
+                <input class="button-login-regis" id="nacionalidad" name="nacionalidad" type="text" placeholder="Nacionalidad">
+                <input class="button-login-regis" id="genero" name="genero" type="text" placeholder="Genero">
+                <input class="button-login-regis" id="direccion" name="direccion" type="text" placeholder="Direccion">
+                <input class="button-login-regis" id="correo" name="correo" type="email" placeholder="Correo">
+                <input class="button-login-regis" id="nacimiento" name="nacimiento" type="text" placeholder="Nacimiento">
+            </div>
+            <div class="buttons-menu">
+                <button class="ingresar button-menu">Buscar</button>
+                <button class="ingresar button-menu">Nuevo</button>
+                <button type="submit" class="ingresar button-menu">Editar</button>
+                <button class="ingresar button-menu">Salir</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
