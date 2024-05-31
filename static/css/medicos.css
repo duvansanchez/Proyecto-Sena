@@ -1,0 +1,19 @@
+body{
+    display: flex;
+    flex-direction: column;
+}
+form{
+    display: flex;
+    max-width: 1200px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+}
+.inputs{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.buttons-menu{
+    margin-bottom: 50px;
+}

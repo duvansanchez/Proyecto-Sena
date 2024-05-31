@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicos</title>
+    <link rel="stylesheet" href="../static/css/medicos.css">
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/medicos.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        let campos = {{ lista_de_campos | tojson }};
+        console.log(campos)
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet">
+
+</head>
+<body>
+    <div class="errores">
+        <form action="/medicos" method="post" onsubmit="return ocultarError()" class="form-error">
+            <div class="error" id="error">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  <ul>
+                    {% for message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                  <button type="submit" id="boton-cerrar" style="display:block;">X</button>  
+                {% endif %}
+                {% endwith %} 
+            </div>
+            <button type="submit" id="boton-cerrar">X</button>  
+        </form>
+    </div>
+    <div class="content-titulo">
+        <h1 class="titulo">Medicos</h1>
+        <form action="/medicos"  method="post" class="salir-form" id="salir-form">
+            <button class="ingresar button-menu salir">Salir</button>
+        </form>
+        <span class="material-symbols-outlined" id="home">
+            cabin
+        </span>
+    </div>
+    <div class="content-regis">
+        <form action="/medicos" method="post" onsubmit="return validarContenido(campos)">
+            <input class="button-login-regis" id="nombre" name="nombre" type="text" placeholder="Nombre" autocomplete="off">  
+            <input class="button-login-regis" id="apellidos" name="apellidos" type="text" placeholder="Apellidos" autocomplete="off">  
+            <input class="button-login-regis" id="nacimiento" name="nacimiento" type="date" placeholder="Nacimiento" autocomplete="off">
+            <input class="button-login-regis" id="tipo_identificacion" name="tipo_identificacion" type="text" placeholder="Tipo Identificacion" autocomplete="off">
+            <input class="button-login-regis" id="cedula" name="cedula" type="text" placeholder="Cedula" autocomplete="off">
+            <input class="button-login-regis" id="telefono" name="telefono" type="text" placeholder="Telefono - Celular" autocomplete="off">
+            <input class="button-login-regis" id="genero" name="genero" type="text" 
+            placeholder="Genero" list="recomendaciones-generos" autocomplete="off">
+            <datalist id="recomendaciones-generos">
+                {% for recomendacion in recomendaciones['generos'] %}
+                <option value="{{ recomendacion[0] }}">
+                {% endfor %}
+            </datalist>
+            <input class="button-login-regis" id="nacionalidad" name="nacionalidad" type="text" placeholder="Nacionalidad" list="recomendaciones-nacionalidades"autocomplete="off">
+            <datalist id="recomendaciones-nacionalidades">
+                {% for recomendacion in recomendaciones['nacionalidades'] %}
+                <option value="{{ recomendacion[0] }}">
+                {% endfor %}
+            </datalist>
+            <input class="button-login-regis" id="direccion" name="direccion" type="text" placeholder="Direccion" autocomplete="off">
+            <input class="button-login-regis" id="correo" name="correo" type="email" placeholder="Correo" autocomplete="off">
+            <input class="button-login-regis" id="especialidad" name="especialidad" type="text" placeholder="Especialidad" list="recomendaciones-especialidades"autocomplete="off">
+            <datalist id="recomendaciones-especialidades">
+                {% for recomendacion in recomendaciones['especialidades'] %}
+                    <option value="{{ recomendacion[0] }}">
+                {% endfor %}
+            </datalist>
+            <input class="button-login-regis" id="usuario" name="usuario" type="text" placeholder="Usuario" autocomplete="off">
+            <div class="buttons-menu">
+                <button class="ingresar button-menu">Buscar</button>
+                <button class="ingresar button-menu">Nuevo</button>
+                <button type="submit" class="ingresar button-menu">Editar</button>
+                {#  <button class="ingresar button-menu">Salir</button>  #}
+            </div>
+        </form>
+    </div>
+</body>
+</html>

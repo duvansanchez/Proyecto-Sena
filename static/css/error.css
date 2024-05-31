@@ -1,0 +1,11 @@
+ html {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-titulo {
+    text-align: center; /* Alinea el texto de h1 horizontalmente */
+}
