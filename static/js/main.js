@@ -21,17 +21,17 @@ function validarContenido(campos) {
     });
     
     if (enviarContenido === false) {
-      //Variable que contiene los nombres de los campos 
       let errorCampos = "Debe de llenar los campos:";
       
-      camposVacios.forEach(function (campo) {        
-        //Limpieza de la info
-        if (campo.includes("_")) {
-          campoClean = campo.replace(/_/g, " ");
-        } else {
-          let formatError = `${errorCampos} <br> ${ponerMayusculas(campo)}`;
+      camposVacios.forEach(function (campo) {    
+          let campoClean = campo    
+          
+          if (campo.includes("_")) {
+            campoClean = campo.replace(/_/g, " ");
+          }
+
+          let formatError = `${errorCampos} <br> ${ponerMayusculas(campoClean)}`;
           errorCampos = formatError;
-        }
       });
       document.getElementById(error).innerHTML = errorCampos;
       botonCerrar.style.display = "block"; // Mostrar boton aceptar
