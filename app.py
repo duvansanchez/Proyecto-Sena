@@ -4,13 +4,18 @@ from cryptography.fernet import Fernet
 from db import DataBase
 from config import Config
 from data_access import DataAccess
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db = DataBase()
 dataQuery = DataAccess()
 
-
+class User(UserMixin): #Heredando y añadiendo automáticamente todos los métodos y propiedades necesarios que Flask-Login requiere para gestionar la autenticación y las sesiones de usuario
+    def __init__(self, id):
+        self.id = id
+        
 # especialidades = db.select(db.consultas['especialidades'])
 
 @app.route('/login', methods=['GET','POST'])

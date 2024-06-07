@@ -3,26 +3,27 @@ import { ponerMayusculas, vaciarCampo } from "./resources.js";
 
 function validarContenido(campos) {
   let enviarContenido = true;
+  let mensajeError = document.getElementById("error");
   let botonCerrar = document.getElementById("boton-cerrar");
   let error = "error";
   
   vaciarCampo(error);
-  
+  console.log("Probando validacion")
+
   try {
     let camposVacios = [];
     
     campos.forEach(function (campo) {
       let valor = document.getElementById(campo).value;
       if (valor === "") {
-        //Agregar a lista de campos vacios y evitar el envio del contenido
         camposVacios.push(campo);
         enviarContenido = false;
       }
     });
-    
+
     if (enviarContenido === false) {
       let errorCampos = "Debe de llenar los campos:";
-      
+
       camposVacios.forEach(function (campo) {    
           let campoClean = campo    
           
@@ -33,8 +34,9 @@ function validarContenido(campos) {
           let formatError = `${errorCampos} <br> ${ponerMayusculas(campoClean)}`;
           errorCampos = formatError;
       });
-      document.getElementById(error).innerHTML = errorCampos;
-      botonCerrar.style.display = "block"; // Mostrar boton aceptar
+      mensajeError.innerHTML = errorCampos;
+      mensajeError.style.display = "block"; 
+      botonCerrar.style.display = "block"; 
     }
   } catch (error) {
     console.error(error);
