@@ -1,4 +1,5 @@
 Averiguar si hay alguna forma mas optima de herederar estilos   
+<<<<<<< HEAD
 Testear si de verdad la informacion no se borra cuando se carga el html y hay que borrar el contenido del campo cuando se carga
 
 - Todos los elementos de entrada (input y demas) deben de tener el atributo name o si no no seran enviadas en el cuerpo del HTTP
@@ -6,3 +7,8 @@ Testear si de verdad la informacion no se borra cuando se carga el html y hay qu
 
 Probar si reinstalando el entorno si lee los paquetes aqui directamente
 Aprendizaje aprendido:
+=======
+
+- Todos los elementos de entrada (input y demas) deben de tener el atributo name o si no no seran enviadas en el cuerpo del HTTP
+- Las funciones que se ejecutan en el JS deben de retornar un false para que el contenido interno se ejecute
+>>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .logo-content{
     display: flex;
     justify-content: center;
@@ -20,6 +21,9 @@
     /* padding: 90px 0; */
 }
 /* .registrarse{  
+=======
+.registrarse{  
+>>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b
     font-family: 'Poppins', sans-serif; 
     background-color: rgb(38, 189, 219);
     border-radius: 5cm;
@@ -30,6 +34,7 @@
     font-size: 20px;
     padding: 14px 16px;
     width: 160px;
+<<<<<<< HEAD
 } */
 .content{
     display: flex;
@@ -38,6 +43,28 @@
     flex-direction:column;
     max-width: 1100px;
     margin: 0px auto;
+=======
+}
+.content{
+    display: flex;
+    align-items: center;
+    flex-direction:column;
+    max-width: 1100px;
+    margin: 50px auto;
+}
+.logo{
+    max-width: 330px;
+    margin-top: -40PX;
+    margin-bottom: 5PX;
+}
+.titulo{
+    font-family: 'Poppins', sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.50px;
+    color: #26bddb;
+    padding-bottom: 10PX;
+>>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b
 }
 .button-login{
     display: block;

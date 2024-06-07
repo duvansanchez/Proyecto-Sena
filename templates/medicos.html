@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicos</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="../static/css/medicos.css">
     <link rel="stylesheet" href="../static/css/base.css">
+=======
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/pacientes.css">
+>>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/medicos.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
@@ -16,6 +21,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet">
@@ -77,10 +83,37 @@
                 {% endfor %}
             </datalist>
             <input class="button-login-regis" id="usuario" name="usuario" type="text" placeholder="Usuario" autocomplete="off">
+=======
+</head>
+<body>
+    <div id="error"></div>
+    <div class="content-titulo">
+        <h1 class="titulo">Medicos</h1>
+    </div>
+    <div class="content-regis">
+        <form action="/medicos" method="post" onsubmit="return validarContenido(campos)">
+            <input class="button-login-regis" id="nombre" name="nombre" type="text" placeholder="Nombre">  
+            <input class="button-login-regis" id="apellidos" name="apellidos" type="text" placeholder="Apellidos">  
+            <input class="button-login-regis" id="nacimiento" name="nacimiento" type="text" placeholder="Nacimiento">
+            <input class="button-login-regis" id="tipo_identificacion" name="" type="text" placeholder="Tipo Identificacion">
+            <input class="button-login-regis" id="cedula" name="cedula" type="text" placeholder="Cedula">
+            <input class="button-login-regis" id="telefono" name="telefono" type="text" placeholder="Telefono - Celular">
+            <input class="button-login-regis" id="genero" name="genero" type="text" 
+            placeholder="Genero">
+            <input class="button-login-regis" id="nacionalidad" name="nacionalidad" type="text" placeholder="Nacionalidad">
+            <input class="button-login-regis" id="direccion" name="direccion" type="text" placeholder="Direccion">
+            <input class="button-login-regis" id="correo" name="correo" type="email" placeholder="Correo">
+            <input class="button-login-regis" id="especialidad" name="especialidad" type="text" placeholder="Especialidad">
+            <input class="button-login-regis" id="usuario" name="usuario" type="text" placeholder="Usuario">
+>>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b
             <div class="buttons-menu">
                 <button class="ingresar button-menu">Buscar</button>
                 <button class="ingresar button-menu">Nuevo</button>
                 <button type="submit" class="ingresar button-menu">Editar</button>
+<<<<<<< HEAD
+=======
+                <button class="ingresar button-menu">Salir</button>
+>>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b
             </div>
         </form>
     </div>
