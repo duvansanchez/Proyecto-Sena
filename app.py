@@ -70,7 +70,7 @@ def usuario():
         data_insert = [data['usuario'],data['cedula'],data['telefono'],data['correo'],data['contraseña']]
         db.insert(insert,data_insert)
         
-        nombre = request.form.get('nombre')
+        nombre = request.form.get('usuario')
         print(f"Nombre recibido: {nombre}")
     
     return render_template('usuario.html', lista_de_campos=lista_de_campos)

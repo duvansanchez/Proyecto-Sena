@@ -22,37 +22,32 @@
 
 </head>
 <body>
-    <div class="errores">
-        <form action="/usuario" method="post" onsubmit="return ocultarError()" class="form-error">
-            <div class="error" id="error">
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                  <ul>
-                    {% for message in messages %}
-                      <li>{{ message }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-                {% endwith %} 
-            </div>
-            <button type="submit" id="boton-cerrar">X</button>
-            
-</head>
-<body>
-    <div class="errores">
-        <form action="/usuario" method="post" onsubmit="return aceptar('error')">
-            <div id="error"></div>
-            <button type="submit" id="boton-cerrar">Aceptar</button>
-        </form>
-    </div>
+       <div class="errores">
+            <form action="/medicos" method="post" onsubmit="return ocultarError()" class="form-error">
+                <div class="error" id="error">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                      <ul>
+                        {% for message in messages %}
+                          <li>{{ message }}</li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                    {% endwith %} 
+                </div>
+                <button type="submit" id="boton-cerrar">X</button>  
+            </form>
+        </div> 
+
     <div class="content-titulo">
         <h1 class="titulo">Usuario</h1>
-        <form action="/medicos"  method="post" class="salir-form" id="salir-form">
-            <button class="ingresar button-menu salir">Salir</button>
-        </form>
+        <p class="usuario-name">USER</p>
         <span class="material-symbols-outlined" id="home">
             cabin
         </span>
+        <form action="/medicos"  method="post" class="salir-form" id="salir-form">
+            <button class="ingresar button-menu salir">Salir</button>
+        </form>
     </div>                                  
     <div class="content-regis">
         <form action="/usuario" method="post" onsubmit="return validarContenido(campos)">

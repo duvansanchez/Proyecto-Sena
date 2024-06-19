@@ -146,7 +146,7 @@ outline: none;
     z-index: 10; /* Asegura que el mensaje esté por encima de otros elementos */
 }
 
-/*Estilo del boton home y salir*/
+/*Estilo del boton home y salir y el campo usuario-name*/
 /*Home*/
 .material-symbols-outlined {
   font-variation-settings:
@@ -183,4 +183,15 @@ outline: none;
     right: 10px; /* Espacio desde el lado izquierdo de la ventana */
     z-index: 10; /* Asegura que el mensaje esté por encima de otros elementos */
 }
-
+.usuario-name{
+    color: #26bddb;
+    background-color: #ffffff;;
+    border-radius: 3cqi;
+    padding: 10px 10px;
+    font-size: 20px;
+    margin-top: 20px;
+    position: fixed;
+    top: 6px; 
+    left: 40px; 
+    z-index: -1; 
+}
