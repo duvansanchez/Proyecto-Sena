@@ -8,24 +8,12 @@ form{
     flex-wrap: wrap;
     justify-content: center;
     align-content: center;
-<<<<<<< HEAD
-=======
-    /* background-color: blue; */
->>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b
 }
 .inputs{
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-<<<<<<< HEAD
 }
 .buttons-menu{
     margin-bottom: 50px;
 }
-=======
-    /* background-color: aqua; */
-}
-.buttons-menu{
-    margin-bottom: 50px;
-}
->>>>>>> ef6d8354ad990c63b9552f7dfd9729d9aae3df5b

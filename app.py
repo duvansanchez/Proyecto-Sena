@@ -44,7 +44,7 @@ def login():
 @app.route('/usuario', methods=['GET','POST'])
 def usuario():
     lista_de_campos = ['usuario', 'cedula', 'telefono', 'correo', 'contraseña', 'confirmar_contraseña']
-
+    
     if request.method == 'POST':
         data = {}
 
@@ -64,7 +64,7 @@ def usuario():
             flash('Ya existe un usuario con esa cedula')
             return redirect(url_for('usuario'))  
         
-        
+
         
         insert = db.inserts['dataUsuarios']
         data_insert = [data['usuario'],data['cedula'],data['telefono'],data['correo'],data['contraseña']]
