@@ -13,10 +13,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!--  
-    {# div class="boton">
-        <button class="registrarse">Registrarse</button>
-    </div>  #}-->
+    <div class="errores">
+        <form action="/medicos" method="post" onsubmit="return ocultarError()" class="form-error">
+            <div class="error" id="error">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  <ul>
+                    {% for message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% endwith %} 
+            </div>
+            <button type="submit" id="boton-cerrar">X</button>  
+        </form>
+    </div> 
+
     <div class="logo-content">        
         <img class="logo" src="../static/logo.png" alt="">
     </div>

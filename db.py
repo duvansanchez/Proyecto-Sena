@@ -17,7 +17,8 @@ class DataBase:
             "validarUsuario":"SELECT TOP 1 usuario FROM usuarios where usuario = ?",
             "validarUsuarioId":"SELECT TOP 1 cedula FROM usuarios where cedula = ?",
             "validarMedico":"SELECT TOP 1 cedula FROM medicos where cedula = ?",
-            "validarMedicoUser":"SELECT TOP 1 usuario FROM medicos where usuario = ?" 
+            "validarMedicoUser":"SELECT TOP 1 usuarios FROM medicos where usuario = ?",
+            "validarLogin":"SELECT TOP 1 usuario FROM usuarios where usuario = ? and contraseña = ?"
         }
    
         self.consultas = {

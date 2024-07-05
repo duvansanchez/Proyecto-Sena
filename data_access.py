@@ -14,6 +14,7 @@ class DataAccess:
         if opcion == 1:
             query = self.db.validadores['validarUsuario']
             resultados = self.db.select(query,data)
+            print(resultados)
             return resultados
         
         #Validar si existe ya un usuario con esa cedula
@@ -35,6 +36,12 @@ class DataAccess:
             resultados = self.db.select(query,data)
             return resultados
 
+    def validarLogin(self,data):
+        query = self.db.validadores['validarLogin']
+        resultados = self.db.select(query,data)
+        print(resultados)
+        return resultados
+    
 #Cargar Informacion
     def especialidades(self):
         especialidades = self.db.select(self.db.consultas['especialidades'])

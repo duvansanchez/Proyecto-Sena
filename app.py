@@ -31,14 +31,16 @@ def login():
         
         usuario =  request.form['usuario']
         contraseña = request.form['contraseña'].encode()
+        data_validate = [usuario,contraseña]
+        validar_usuario = list(dataQuery.validarLogin(data_validate))[0][0]
+        print(len(validar_usuario))
 
-        # Encriptar la contraseña
-        encrypted_password = fernet.encrypt(contraseña)
-        print(f"Contraseña encriptada: {encrypted_password}")
-        print(f"Clave de encriptación: {clave}")
-                
-        decrypted_password = fernet.decrypt(encrypted_password)
-        print(f"Contraseña desencriptada: {decrypted_password.decode()}")
+
+        if len(validar_usuario) != 0:
+            print('Credenciales incorrectas')
+            flash('Credenciales incorrectas')
+            return redirect(url_for('login'))  
+
     return render_template('login.html')
 
 @app.route('/usuario', methods=['GET','POST'])
@@ -142,8 +144,6 @@ def medicos():
         db.insert(insert,data_insert)
         
     return render_template('medicos.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones)
-
-
 
 
 if __name__ ==  '__main__': 
