@@ -26,9 +26,10 @@ class DataBase:
             "nacionalidades":"SELECT nacionalidad FROM nacionalidades",
             "generos":"SELECT genero from generos"
         }
+   
     def conexiondb(self):
         # Crear variables de entorno
-        server = 'DESKTOP-AK1M9SS' 
+        server = 'DESKTOP-T71IG1E' 
         database = 'PROYECTO SENA'
         username = 'sa'
         password = 'Infotec123'
@@ -40,8 +41,8 @@ class DataBase:
             cursor = conexion.cursor()
             
             print(f"Exito en la conexión")
-            
             return cursor,conexion
+        
         except Exception as e:
             print(f"Error en la conexión: {e}")
 

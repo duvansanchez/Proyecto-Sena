@@ -39,7 +39,7 @@ class DataAccess:
     def validarLogin(self,data):
         query = self.db.validadores['validarLogin']
         resultados = self.db.select(query,data)
-        print(resultados)
+
         return resultados
     
 #Cargar Informacion

@@ -22,7 +22,7 @@
 
 </head>
 <body>
-       <div class="errores">
+    <div class="errores">
             <form action="/medicos" method="post" onsubmit="return ocultarError()" class="form-error">
                 <div class="error" id="error">
                     {% with messages = get_flashed_messages() %}
@@ -41,7 +41,7 @@
 
     <div class="content-titulo">
         <h1 class="titulo">Usuario</h1>
-        <p class="usuario-name">USER</p>
+        <p class="usuario-name">{{ usuario_login }}</p>
         <span class="material-symbols-outlined" id="home">
             cabin
         </span>
