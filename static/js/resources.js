@@ -3,7 +3,7 @@ function ponerMayusculas(cadena) {
         return letra.toUpperCase();
     });
 }
-function vaciarCampo(campo){
-    document.getElementById(campo).innerHTML = '';
-}
-export { ponerMayusculas,vaciarCampo };
+// function vaciarCampo(campo){
+//     document.getElementById(campo).innerHTML = '';
+// }
+export { ponerMayusculas };

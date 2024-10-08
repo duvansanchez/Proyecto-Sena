@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salas</title>
+    <link rel="stylesheet" href="../static/css/base.css">
+    <link rel="stylesheet" href="../static/css/salas.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/salas.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        let campos = {{ lista_de_campos | tojson }};
+        console.log(campos)
+        console.log('Si se ejecuta el js')
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet">
+
+</head>
+<body>
+    <div class="errores">
+        <form action="/salas" method="post" onsubmit="return ocultarError()" class="form-error">
+            <div class="error" id="error">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  <ul>
+                    {% for message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% endwith %} 
+            </div>
+            <button type="submit" id="boton-cerrar">X</button>       
+        </form>
+    </div>
+    <div class="content-titulo">
+        <h1 class="titulo">Salas</h1>
+        <p class="usuario-name">{{ usuario_login }}</p>
+
+        <form action="/medicos"  method="post" class="salir-form" id="salir-form">
+            <button class="ingresar button-menu salir">Salir</button>
+        </form>
+        <span class="material-symbols-outlined" id="home">
+            cabin
+        </span>
+    </div>
+    <div class="content-regis">
+        <form action="/salas" method="post" onsubmit="">
+            <!-- Caja de contenido -->
+            <div class="inputs">
+                <!-- Menu de asignacion -->
+                <div class="box-content">
+                    <input class="button-login-regis" id="sala-med" name="sala" type="text" placeholder="Sala" autocomplete="off">  
+                    <input class="button-login-regis" id="medicos" name="medicos" type="text" placeholder="Medicos"  minlength="5" autocomplete="off">   
+                    <button type="submit" class="ingresar button-menu">Asignar</button>
+                </div>
+                <!-- Salas medicos -->
+                <div class="box-medicos">
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 1" autocomplete="off">
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 2" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 3" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 4" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 5" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 6" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 7" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 8" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 9" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 10" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 11" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+                <input class="button-login-regis" id="sala" name="sala" type="text" placeholder="Sala 12" autocomplete="off">  
+                <input class="button-login-regis" id="medico" name="medico" type="text" placeholder="Medico" autocomplete="off">  
+
+                </div>
+            </div>
+        </form>
+        <form action="" method="post" onsubmit="">
+            <!-- Menu -->
+            <div class="buttons-menu">
+                <button id="button-editar" type="button" class="ingresar button-menu" onclick="cambiarTextoBoton('button-editar', 'Guardar', event)">Editar</button>
+            </div>
+        </form>
+
+    </div>
+</body>
+</html>

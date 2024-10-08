@@ -1,0 +1,82 @@
+{% macro search_and_results_form(results=[]) %}
+    <style>
+        :root{
+            --main-color: #26bddb;
+            --second-color:  rgb(0, 183, 255);
+        }
+        *{
+            padding: 0px;
+            margin: 0px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            background: rgb(207,226,255);
+            background: radial-gradient(circle, rgba(207,226,255,1) 15%, rgba(255,255,255,1) 100%);
+            
+        }
+        .box{
+            background-color: rgb(255, 255, 255);
+            width: 500px;
+            border: 3px solid var(--second-color);
+            margin: 0 auto;
+            justify-content: center;
+            text-align: center; 
+        }
+        .title{
+            color: var(--main-color);
+        }
+    </style>
+    {% if results %}
+        <form action="/submit_results" method="POST">
+
+            <div class="content-box">
+                <h3 class="title">Resultados</h3>
+            </div>
+            <div class="content-result">
+                <ul>
+                    {% for result in results %}
+                        <li>
+                            <input type="text" name="selected_results" value="{{ result['name'] }}" style="color: red;">
+                        </li>
+                        <li>{{ result }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+           
+            <button type="submit">Enviar Resultados</button>
+        </form>
+    {% else %}
+        <p>No se encontraron resultados.</p>
+    {% endif %}
+{% endmacro %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Búsqueda</title>
+</head>
+<body>
+    <search-and-results-form></search-and-results-form>
+
+    <script>
+        // Obtén los datos del backend que fueron inyectados en la plantilla
+        const results = {{ results|tojson }};
+        
+        // Selecciona tu componente
+        const componente = document.querySelector('search-and-results-form');
+        
+        // Asigna los datos al componente, lo que activará el setter
+        componente.results = results;
+    </script>
+</body>
+</html>
+

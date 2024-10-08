@@ -5,3 +5,14 @@ Testear:
 Aprendizaje adquirido:
 - Todos los elementos de entrada (input y demas) deben de tener el atributo name o si no no seran enviadas en el cuerpo del HTTP
 - Las funciones que se ejecutan en el JS deben de retornar un false para que el contenido interno se ejecute
+- Las rutas de los archivos si son js deben finalizar con la extension, si no las va a reconocer
+- Todo fuera mas facil si las peticiones HTTP se realizan del front al backend por ejemplo con fetch, tanto como para validaciones y traspaso de los datos
+-La implementacion de un elemento HTML para enviar los datos originales antes de modificarlos, es de las cosas mas horrorosas que he podido codear, pero todo esto debido a la forma en la que se comunican el front y el backend, si fuera sido una relacion mas directa, todo fuera mas estetico y sobre todo mas facil
+
+Planificacion:
+    Validar si puedo pasar la lista de los campos en json directamente de Python
+    Hacer front vista horarios medicos y salas
+    Arreglar botones de inicio flotante
+    Poder agregar horarios medicos y salas
+
+

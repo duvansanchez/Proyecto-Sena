@@ -17,14 +17,19 @@ class DataBase:
             "validarUsuario":"SELECT TOP 1 usuario FROM usuarios where usuario = ?",
             "validarUsuarioId":"SELECT TOP 1 cedula FROM usuarios where cedula = ?",
             "validarMedico":"SELECT TOP 1 cedula FROM medicos where cedula = ?",
-            "validarMedicoUser":"SELECT TOP 1 usuarios FROM medicos where usuario = ?",
+            "validarMedicoUser":"SELECT TOP 1 usuario FROM medicos where usuario = ?",
             "validarLogin":"SELECT TOP 1 usuario FROM usuarios where usuario = ? and contraseña = ?"
         }
    
         self.consultas = {
             "especialidades":"SELECT especialidad FROM especialidades",
             "nacionalidades":"SELECT nacionalidad FROM nacionalidades",
-            "generos":"SELECT genero from generos"
+            "generos":"SELECT genero from generos",
+            "doctors":"SELECT * FROM medicos",
+            "busqueda_usuario":"SELECT * from usuarios WHERE usuario = ? or cedula = ?"
+        }
+        self.actualizar = {
+            "actualizar_usuario": "UPDATE [dbo].[Usuarios] SET [usuario] = ?, [cedula] = ?, [telefono] = ?, [correo] = ?, [contraseña] = ? WHERE usuario = ? and cedula = ?"
         }
    
     def conexiondb(self):
@@ -40,7 +45,6 @@ class DataBase:
             conexion = pyodbc.connect(conexion_string)
             cursor = conexion.cursor()
             
-            print(f"Exito en la conexión")
             return cursor,conexion
         
         except Exception as e:
@@ -55,34 +59,29 @@ class DataBase:
             # Confirma los cambios en la base de datos    
             conexion.commit()
 
-            print("Procedimiento almacenado ejecutado exitosamente.")
 
             # Cierra el cursor y la conexión
             cursor.close()
             conexion.close()
+            return "Insert hecho correctamente"
 
         except Exception as e:
-            print(f"Error en la conexión: {e}")
             cursor.close()
             conexion.close()
+            return "No se pudo realizar el insert"
 
-    def update(self,update,values):
+    def update(self, update, values):
         cursor, conexion = self.conexiondb()
 
         try:
-            obtener = cursor.execute(update,values)
-
-            # Confirma los cambios en la base de datos
+            cursor.execute(update, values)
             conexion.commit()
-
-            print("Procedimiento almacenado ejecutado exitosamente.")
-
-            # Cierra el cursor y la conexión
-            cursor.close()
-            conexion.close()
-
+            print("Update hecho correctamente")
+            return True  # Indica que la operación fue exitosa
         except Exception as e:
-            print(f"Error en la conexión: {e}")
+            print(f"Error al actualizar los datos: {e}")
+            return False  # Indica que la operación falló
+        finally:
             cursor.close()
             conexion.close()
 
@@ -97,11 +96,9 @@ class DataBase:
             if len(resultados) == 0:
                 return [['']]
             else:
-                print("Consulta hecha correctamente")
-                print(resultados)
                 return resultados
         except Exception as e:
-            print(f"Error en la conexión: {e}")
+            print(f"Error al consultar datos: {e}")
 
         finally:
             # Cerrar el cursor y la conexión siempre, independientemente de si hubo un error

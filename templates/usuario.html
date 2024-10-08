@@ -4,26 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuario</title>
-    <link rel="stylesheet" href="../static/css/base.css">
-    <link rel="stylesheet" href="../static/css/usuario.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/usuario.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/SearchAndResultsForm.js') }}"></script>
     <script>
         let campos = {{ lista_de_campos | tojson }};
-        console.log(campos)
     </script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" >
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
 </head>
 <body>
+
+    
     <div class="errores">
-            <form action="/medicos" method="post" onsubmit="return ocultarError()" class="form-error">
+            <form action="/usuario" method="post" onsubmit="return ocultarError()" class="form-error">
                 <div class="error" id="error">
                     {% with messages = get_flashed_messages() %}
                     {% if messages %}
@@ -37,7 +37,7 @@
                 </div>
                 <button type="submit" id="boton-cerrar">X</button>  
             </form>
-        </div> 
+    </div> 
 
     <div class="content-titulo">
         <h1 class="titulo">Usuario</h1>
@@ -45,26 +45,37 @@
         <span class="material-symbols-outlined" id="home">
             cabin
         </span>
-        <form action="/medicos"  method="post" class="salir-form" id="salir-form">
+        <form action="/usuario"  method="post" class="salir-form" id="salir-form">
             <button class="ingresar button-menu salir">Salir</button>
-        </form>
+        </form> 
     </div>                                  
     <div class="content-regis">
-        <form action="/usuario" method="post" onsubmit="return validarContenido(campos)">
-                <input class="button-login-regis" type="text" placeholder="Usuario" name="usuario" id='usuario' minlength="5" maxlength="10" autocomplete="off">  
-                <input class="button-login-regis" type="number" placeholder="Cedula" name="cedula" id='cedula'  minlength="5" autocomplete="off">   
-                <input class="button-login-regis" id='telefono' type="text" placeholder="Telefono" name="telefono" autocomplete="off">
-                <input class="button-login-regis" id='correo' type="email" placeholder="Correo" name="correo" autocomplete="off">
-                <input class="button-login-regis" id='contraseña' type="password" placeholder="Contraseña" name="contraseña" autocomplete="off">
-                <input class="button-login-regis" id='confirmar_contraseña' type="password" placeholder="Confirmar contraseña" name="confirmar_contraseña" autocomplete="off">
-                <div class="buttons-menu">
-                    <button class="ingresar button-menu">Buscar</button>
-                    <button class="ingresar button-menu">Nuevo</button>
-                    <button type="submit" class="ingresar button-menu">Editar</button>
-                </div>
+        <form id="formUsuario" action="/usuario" method="post" onsubmit="">
+            <input class="button-login-regis" type="text" placeholder="Usuario" name="usuario" id="usuario" minlength="5" maxlength="10" autocomplete="off" value="{{ usuario }}">
+            <input class="button-login-regis" type="number" placeholder="Cedula" name="cedula" id="cedula" value="{{ cedula }}" minlength="5" autocomplete="off">         
+            <input class="button-login-regis" placeholder="Telefono" id="telefono" value="{{ telefono }}" type="text" name="telefono" autocomplete="off">        
+            <input class="button-login-regis" id="correo" value="{{ correo }}" type="email" placeholder="Correo" name="correo" autocomplete="off">      
+            <input class="button-login-regis" id="contraseña" value="{{ contraseña }}" type="password" placeholder="Contraseña" name="contraseña" autocomplete="off">
+            <input class="button-login-regis" id="confirmar_contraseña" value="{{ confirmar_contraseña }}" type="password" placeholder="Confirmar contraseña" name="confirmar_contraseña" autocomplete="off">
+            <div class="buttons-menu">
+                <button id="nuevo" name="accion" type="button" value="nuevo" class="ingresar button-menu" onclick="return logicaBotones('nuevo')">Nuevo</button>
+                {% if usuario == '' %}
+                    <button id="buscar" name="accion" value="buscar" class="ingresar button-menu"  onclick="return logicaBotones('buscar')">Buscar</button>
+                {% endif %}
+                {% if usuario %}
+                    <button id="editar" name="accion" type="button" value="editar" class="ingresar button-menu" onclick="return logicaBotones('editar')">Editar</button>
+                {% endif %}
+                <button id="guardar" name="accion" value="guardar" class="ingresar button-menu" onclick="return validarContenido(campos); logicaBotones('guardar'); ">Guardar</button>
+                <button id="x" name="accion" value="x" class="ingresar button-menu" onclick="return logicaBotones('x')">X</button>
+                <button id="actualizar"  name="accion" value="actualizar" class="ingresar button-menu" onclick="return logicaBotones('actualizar')">Actualizar</button>
+                <button  class="ingresar button-menu" type="button" onclick="recargarPagina()">Cancelar</button>
+
+            </div>
+            <input type="hidden" id="datosOriginales" name="datosOriginales">
+
+
         </form>
     </div>
 </body>
 </html>
-
 

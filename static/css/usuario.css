@@ -1,12 +1,6 @@
-/* <link rel="stylesheet" href="/Login Salud/entorno/static/css/usuario.css">
-<link rel="stylesheet" href="/Login Salud/entorno/static/css/base.css"> */
-body{
-    display: flex;
-    flex-direction: column;
-}
 form{
-    max-width: 1200px;
     display: flex;
+    max-width: 1200px;
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -17,4 +11,7 @@ form{
     color: rgb(255, 255, 255);
     font-size: 0.8em;
     margin-top: 5px;
+}
+#buscador{
+    display: none;
 }

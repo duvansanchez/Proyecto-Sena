@@ -1,0 +1,47 @@
+.box-content{
+    align-items: center;
+    padding-left: 19px;
+}
+.box-medicos{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: 20px;
+    width: 93em;
+}
+#sala, #sala-med{
+    width: 90px;
+    text-align: center;
+}
+.buttons-menu{
+    margin-top: -3px;
+}
+.button-menu{
+    display: inline;
+}
+.button-login-regis{
+    width: 375px;
+    padding: 10px 10px;
+}
+.button-login-regis::placeholder{
+    font-size: 19px;
+    font-weight: 700;
+    color: #0B004B;
+}
+@media (max-width: 664px) {
+    .usuario-name {
+        display: none;
+    }
+    .content-titulo{
+        display: flex;
+        justify-content: flex-start;      
+        padding-left: 10px;
+    }
+
+}
+@media (max-width: 686px) {
+    .box-medicos {
+      width: 85%; 
+    }
+}
