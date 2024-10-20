@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Citas Médicas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citas.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        .patient-search-modal {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 10;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+        }
+        .calendar-cell {
+            background-color: #fff;
+            min-height: 80px;
+            position: relative;
+            padding: 4px;
+            cursor: pointer;
+        }
+        .calendar-cell.disabled {
+            background-color: #f9fafb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .calendar-cell.selected {
+            background-color: #bfdbfe;
+        }
+        .calendar-cell:hover:not(.disabled) {
+            background-color: #e0f2fe;
+        }
+        .calendar-time {
+            font-size: 0.75rem;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            color: #6b7280;
+        }
+        .day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 8px 0;
+            background-color: #f3f4f6;
+        }
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .calendar-navigation button {
+            background-color: #3b82f6;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .calendar-navigation span {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>   
+    <div class="errores">
+        <form action="/crearcitas" method="post" onsubmit="return ocultarError()" class="form-error">
+            <div class="error" id="error">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  <ul>
+                    {% for message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% endwith %} 
+            </div>
+            <button type="submit" id="boton-cerrar">X</button>  
+        </form>
+</div> 
+    <div class="content-titulo">
+        <h1 class="titulo text-3xl font-bold text-center text-blue-600 mb-8">Sistema de Citas Médicas</h1>
+        <p class="usuario-name">{{ usuario_login }}</p>
+        <span class="material-symbols-outlined" id="home">
+            cabin
+        </span>
+        <form action="/usuario"  method="post" class="salir-form" id="salir-form">
+            <button class="ingresar button-menu salir">Salir</button>
+        </form> 
+    </div>  
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8"></h1>
+        
+        <!-- Crear Nueva Cita -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden max-w-2xl mx-auto mb-8">
+            <h2 class="color-main-text text-xl font-bold p-4 bg-blue-50 text-blue-700 text-center uppercase">Crear Cita</h2>
+            <form id="formularioCita" class="p-4 space-y-4" method="post">
+                <!-- Campos de fecha y hora seleccionadas -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="fecha" class="color-main-text block text-lg font-semibold text-gray-700 mb-1">Fecha Seleccionada</label>
+                        <input type="text" id="fecha" required readonly class="w-full px-4 py-2 border rounded-lg text-gray-700 bg-gray-100" name="fecha_cita">
+                    </div>
+                    <div>
+                        <label for="hora_llegada" class="color-main-text block text-lg font-semibold text-gray-700 mb-1">Hora Seleccionada</label>
+                        <input type="text" id="hora_llegada" required readonly class="w-full px-4 py-2 border rounded-lg text-gray-700 bg-gray-100" name="hora_cita">
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="codigo_paciente" placeholder="Buscar paciente" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-gray-100" oninput="habilitarCampos()" name="cedula">
+                        <button id="buscarPacienteBtn" class="color-main bg-blue-500 text-white px-4 py-2 rounded-lg" name="accion" value="buscar_paciente">
+                            Buscar
+                        </button>
+                    </div>
+                    <div id="pacienteSearchModal" class="patient-search-modal">
+                        <div class="p-4">
+                            <div class="flex space-x-2 mb-4">
+                                <input type="text" id="searchInput" placeholder="Buscar paciente" class="flex-grow px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
+                                <select id="searchType" class="px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
+                                    <option value="nombre">Nombre</option>
+                                    <option value="cedula">Cédula</option>
+                                </select>
+                            </div>
+                            <ul id="searchResults" class="space-y-2"></ul>
+                        </div>
+                    </div>
+                </div>
+                <input type="text" id="nombre_paciente" placeholder="Nombre del Paciente" required readonly class="w-full px-4 py-2 border rounded-lg text-gray-700 bg-gray-100" value="{{ nombre_paciente }}">
+                <!-- Selector de Especialidad y Médico -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="especialidad" class="color-main-text block text-lg font-semibold text-gray-700 mb-1">Especialidad</label>
+                        <select id="especialidad" required class="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500" disabled>
+                            <option value="">Seleccione Especialidad</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="medico" class="color-main-text block text-lg font-semibold text-gray-700 mb-1">Médico</label>
+                        <select id="medico" required disabled class="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500" disabled>
+                            <option value="">Seleccione un Médico</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="text" id="nombre_medico" placeholder="Nombre del Médico" required readonly class="w-full px-4 py-2 border rounded-lg text-gray-700 bg-gray-100" name="fecha_cita">
+                	
+                <button id="crear-cita" type="submit"
+                        class="color-main w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+                    Crear Cita
+                </button>
+            </form>
+        </div>
+
+        <!-- Calendario del Médico Seleccionado -->
+        <div id="horarioMedicoContainer" class="bg-white shadow-md rounded-lg overflow-hidden max-w-4xl mx-auto" style="display: none;">
+            <h2 class="color-main-text text-xl font-semibold p-4 bg-blue-50 text-blue-700">Calendario del Médico Seleccionado</h2>
+            <div class="p-4">
+                <div class="calendar-navigation">
+                    <button class="color-main" id="prevWeekBtn">&larr; Semana Anterior</button>
+                    <span id="currentWeekLabel"></span>
+                    <button class="color-main" id="nextWeekBtn">Semana Siguiente &rarr;</button>
+                </div>
+                <div id="horarioMedico">
+                    <!-- El calendario del médico se cargará aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de pacientes cargados desde el backend
+        const pacientes = {{ pacientes|tojson|safe }};
+
+        // Datos de especialidades y médicos cargados desde el backend
+        const especialidades = {{ especialidades|tojson|safe }};
+        console.log('Especialidades:', especialidades);
+
+        const medicos = {{ medicos|tojson|safe }};
+        console.log('Médicos:', medicos);
+
+        let currentWeekStartDate; // Variable para controlar la semana actual en el calendario
+
+        // Función para cargar las especialidades en el selector
+        function cargarEspecialidades() {
+            const especialidadSelect = document.getElementById('especialidad');
+            especialidadSelect.innerHTML = '<option value="">Seleccione Especialidad</option>';
+            especialidades.forEach(especialidad => {
+                const option = document.createElement('option');
+                option.value = especialidad;
+                option.textContent = especialidad;
+                especialidadSelect.appendChild(option);
+            });
+        }
+
+        // Función para cargar los médicos según la especialidad seleccionada
+        function cargarMedicosPorEspecialidad(especialidadSeleccionada) {
+            const medicoSelect = document.getElementById('medico');
+            medicoSelect.innerHTML = '<option value="">Seleccione un Médico</option>';
+            if (especialidadSeleccionada) {
+                const medicosFiltrados = medicos.filter(medico => medico.especialidad === especialidadSeleccionada);
+                medicosFiltrados.forEach(medico => {
+                    const option = document.createElement('option');
+                    option.value = medico.id;
+                    option.textContent = medico.nombre;
+                    medicoSelect.appendChild(option);
+                });
+                medicoSelect.disabled = false;
+            } else {
+                medicoSelect.disabled = true;
+            }
+        }
+
+        // Función para generar un rango de horas entre dos horas dadas
+        function generarHoras(inicio, fin) {
+            const horas = [];
+            let horaActual = new Date(`1970-01-01T${inicio}:00`);
+            const horaFin = new Date(`1970-01-01T${fin}:00`);
+
+            while (horaActual < horaFin) {
+                horas.push(horaActual.toTimeString().substring(0,5));
+                horaActual.setMinutes(horaActual.getMinutes() + 60); // Incremento de 1 hora
+            }
+            return horas;
+        }
+
+        // Función para obtener las fechas de la semana a partir de una fecha dada (Lunes a Domingo)
+        function obtenerSemana(fechaReferencia) {
+            const fecha = new Date(fechaReferencia);
+            const diaSemana = fecha.getDay(); // 0 (Domingo) - 6 (Sábado)
+            const fechaInicio = new Date(fecha);
+            fechaInicio.setDate(fecha.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1)); // Ajustar si es Domingo
+            const semana = [];
+
+            for (let i = 0; i < 7; i++) {
+                const fechaDia = new Date(fechaInicio);
+                fechaDia.setDate(fechaInicio.getDate() + i);
+                semana.push(fechaDia);
+            }
+            return semana;
+        }
+
+        // Función para mostrar el calendario del médico seleccionado
+        function mostrarCalendarioMedico(medicoId, fechaInicioSemana = new Date()) {
+            const medico = medicos.find(m => m.id == medicoId);
+            console.log(medico)
+            if (medico) {
+                console.log('Médico seleccionado:', medico);
+                const horarioContainer = document.getElementById('horarioMedicoContainer');
+                const horarioMedico = document.getElementById('horarioMedico');
+                horarioMedico.innerHTML = '';
+
+                currentWeekStartDate = new Date(fechaInicioSemana);
+
+                const semana = obtenerSemana(currentWeekStartDate);
+                const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+                // Actualizar etiqueta de la semana actual
+                const currentWeekLabel = document.getElementById('currentWeekLabel');
+                const fechaInicioLabel = semana[0].toLocaleDateString();
+                const fechaFinLabel = semana[6].toLocaleDateString();
+                currentWeekLabel.textContent = `Semana del ${fechaInicioLabel} al ${fechaFinLabel}`;
+
+                // Crear encabezados de días
+                const headers = document.createElement('div');
+                headers.className = 'calendar-grid';
+                semana.forEach(fechaDia => {
+                    const headerCell = document.createElement('div');
+                    headerCell.className = 'day-header';
+                    headerCell.textContent = diasSemana[fechaDia.getDay()] + ' ' + fechaDia.getDate() + '/' + (fechaDia.getMonth() + 1);
+                    headers.appendChild(headerCell);
+                });
+                horarioMedico.appendChild(headers);
+
+                // Generar las horas de trabajo del médico durante la semana
+                const horasTrabajo = {};
+                medico.horarios.forEach(horario => {
+                    const indiceDia = diasSemana.indexOf(horario.dia);
+                    if (indiceDia !== -1) {
+                        const horas = generarHoras(horario.inicio, horario.fin);
+                        horasTrabajo[indiceDia] = horas;
+                    }
+                });
+
+                // Obtener todas las horas posibles (asumiendo de 08:00 a 18:00)
+                const horasDelDia = generarHoras('08:00', '18:00');
+
+                // Crear las celdas del calendario
+                horasDelDia.forEach(hora => {
+                    const row = document.createElement('div');
+                    row.className = 'calendar-grid';
+
+                    for (let i = 0; i < 7; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'calendar-cell';
+
+                        const fechaCelda = semana[i];
+                        const fechaString = fechaCelda.toISOString().split('T')[0];
+
+                        const horaDisponible = horasTrabajo[fechaCelda.getDay()] && horasTrabajo[fechaCelda.getDay()].includes(hora);
+                        const citaOcupada = medico.citas.some(cita => cita.fecha === fechaString && cita.hora === hora);
+
+                        if (!horaDisponible) {
+                            cell.classList.add('disabled');
+                        }
+                        if (citaOcupada) {
+                            cell.classList.add('disabled');
+                            cell.textContent = 'Ocupado';
+                        }
+                        if (horaDisponible && !citaOcupada) {
+                            cell.textContent = hora;
+                            cell.addEventListener('click', () => {
+                                seleccionarHora(fechaString, hora, cell);
+                            });
+                        }
+
+                        if (!horaDisponible && !citaOcupada) {
+                            cell.textContent = '';
+                        }
+
+                        row.appendChild(cell);
+                    }
+                    horarioMedico.appendChild(row);
+                });
+
+                horarioContainer.style.display = 'block';
+                document.getElementById('nombre_medico').value = medico.nombre;
+            } else {
+                alert('No se encontró el médico seleccionado.');
+                document.getElementById('horarioMedicoContainer').style.display = 'none';
+                document.getElementById('nombre_medico').value = '';
+                return;
+            }
+        }
+
+        // Función para manejar la selección de una hora
+        function seleccionarHora(fecha, hora, cell) {
+            // Limpiar selección previa
+            document.querySelectorAll('.calendar-cell.selected').forEach(c => c.classList.remove('selected'));
+            // Marcar la celda seleccionada
+            cell.classList.add('selected');
+            // Actualizar campos del formulario
+            document.getElementById('fecha').value = fecha;
+            document.getElementById('hora_llegada').value = hora;
+        }
+
+        // Función para cambiar de semana en el calendario
+        function cambiarSemana(direccion) {
+            const diasCambio = direccion === 'next' ? 7 : -7;
+            currentWeekStartDate.setDate(currentWeekStartDate.getDate() + diasCambio);
+            const medicoId = document.getElementById('medico').value;
+            if (medicoId) {
+                mostrarCalendarioMedico(medicoId, currentWeekStartDate);
+            }
+        }
+
+
+        // Event Listeners
+        //document.addEventListener('DOMContentLoaded', habilitarCampos);
+
+        // Escuchar el evento 'input' para que se ejecute cada vez que se escriba en el campo
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarEspecialidades();
+
+            document.getElementById('especialidad').addEventListener('change', (e) => {
+                const especialidadSeleccionada = e.target.value;
+                cargarMedicosPorEspecialidad(especialidadSeleccionada);
+                // Limpiar selección de médico
+                document.getElementById('medico').value = '';
+                document.getElementById('medico').disabled = !especialidadSeleccionada;
+                // Ocultar calendario y limpiar nombre del médico
+                document.getElementById('horarioMedicoContainer').style.display = 'none';
+                document.getElementById('nombre_medico').value = '';
+            });
+
+            document.getElementById('medico').addEventListener('change', (e) => {
+                currentWeekStartDate = new Date(); // Reiniciar a la semana actual
+                const medicoId = e.target.value;
+                if (medicoId) {
+                    mostrarCalendarioMedico(medicoId, currentWeekStartDate);
+                } else {
+                    // Ocultar calendario y limpiar nombre del médico
+                    document.getElementById('horarioMedicoContainer').style.display = 'none';
+                    document.getElementById('nombre_medico').value = '';
+                }
+            });
+
+            document.getElementById('prevWeekBtn').addEventListener('click', () => {
+                cambiarSemana('prev');
+            });
+
+            document.getElementById('nextWeekBtn').addEventListener('click', () => {
+                cambiarSemana('next');
+            });
+
+           document.getElementById('crear-cita').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fecha = document.getElementById('fecha').value;
+                const hora = document.getElementById('hora_llegada').value;
+
+                if (!fecha || !hora) {
+                    alert('Por favor, seleccione una fecha y hora en el calendario.');
+                    return;
+                }
+
+                e.target.submit();
+            });
+
+            // Llamar a la función cuando la página se cargue, por si el campo ya tiene un valor predefinido
+            
+            document.getElementById('nombre_paciente').addEventListener('input', habilitarCampos);
+
+            function habilitarCampos() {
+                const nombrePaciente = document.getElementById('nombre_paciente').value;
+                const especialidad = document.getElementById('especialidad');
+                const medico = document.getElementById('medico');
+    
+                // Si el campo de nombre de paciente no está vacío, habilita los selects
+                if (nombrePaciente.trim() !== '') {
+                    especialidad.disabled = false;
+                    medico.disabled = false;
+                } else {
+                    especialidad.disabled = true;
+                    medico.disabled = true;
+                }
+            }
+            habilitarCampos()
+        });
+    </script>
+</body>
+</html>

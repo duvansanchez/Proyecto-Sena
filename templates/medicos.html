@@ -48,40 +48,71 @@
         </span>
     </div>
     <div class="content-regis">
-        <form action="/medicos" method="post" onsubmit="return validarContenido(campos)">
-            <input class="button-login-regis" id="nombre" name="nombre" type="text" placeholder="Nombre" autocomplete="off">  
-            <input class="button-login-regis" id="apellidos" name="apellidos" type="text" placeholder="Apellidos" autocomplete="off">  
-            <input class="button-login-regis" id="nacimiento" name="nacimiento" type="date" placeholder="Nacimiento" autocomplete="off">
-            <input class="button-login-regis" id="tipo_identificacion" name="tipo_identificacion" type="text" placeholder="Tipo Identificacion" autocomplete="off">
-            <input class="button-login-regis" id="cedula" name="cedula" type="text" placeholder="Cedula" autocomplete="off">
-            <input class="button-login-regis" id="telefono" name="telefono" type="text" placeholder="Telefono - Celular" autocomplete="off">
-            <input class="button-login-regis" id="genero" name="genero" type="text" 
-            placeholder="Genero" list="recomendaciones-generos" autocomplete="off">
+        <form id="form" action="/medicos" method="post">
+            <input class="button-login-regis" id="nombre" name="nombre" type="text" placeholder="Nombre" autocomplete="off" value="{{ data.nombre or '' }}">
+
+            <input class="button-login-regis" id="apellidos" name="apellidos" type="text" placeholder="Apellidos" autocomplete="off" value="{{ data.apellidos or '' }}">
+
+            <input class="button-login-regis" id="nacimiento" name="nacimiento" type="date" placeholder="Nacimiento" autocomplete="off" value="{{ data.nacimiento or '' }}">
+
+            <input class="button-login-regis" id="tipo_identificacion" name="tipo_identificacion" type="text" placeholder="Tipo Identificacion" autocomplete="off" value="{{ data.tipo_identificacion or '' }}">
+
+            <input class="button-login-regis" id="cedula" name="cedula" type="text" placeholder="Cedula" autocomplete="off" value="{{ data.cedula or '' }}">
+
+            <input class="button-login-regis" id="telefono" name="telefono" type="text" placeholder="Telefono - Celular" autocomplete="off" value="{{ data.telefono or '' }}">
+            
+            <input class="button-login-regis" id="genero" name="genero" type="text" placeholder="Genero" list="recomendaciones-generos" autocomplete="off" value="{{ data.genero or '' }}">
             <datalist id="recomendaciones-generos">
                 {% for recomendacion in recomendaciones['generos'] %}
                 <option value="{{ recomendacion[0] }}">
                 {% endfor %}
             </datalist>
-            <input class="button-login-regis" id="nacionalidad" name="nacionalidad" type="text" placeholder="Nacionalidad" list="recomendaciones-nacionalidades"autocomplete="off">
+
+            <input class="button-login-regis" id="nacionalidad" name="nacionalidad" type="text" placeholder="Nacionalidad" list="recomendaciones-nacionalidades" autocomplete="off" value="{{ data.nacionalidad or '' }}">
             <datalist id="recomendaciones-nacionalidades">
                 {% for recomendacion in recomendaciones['nacionalidades'] %}
                 <option value="{{ recomendacion[0] }}">
                 {% endfor %}
             </datalist>
-            <input class="button-login-regis" id="direccion" name="direccion" type="text" placeholder="Direccion" autocomplete="off">
-            <input class="button-login-regis" id="correo" name="correo" type="email" placeholder="Correo" autocomplete="off">
-            <input class="button-login-regis" id="especialidad" name="especialidad" type="text" placeholder="Especialidad" list="recomendaciones-especialidades"autocomplete="off">
+
+            <input class="button-login-regis" id="direccion" name="direccion" type="text" placeholder="Direccion" autocomplete="off" value="{{ data.direccion or '' }}">
+
+            <input class="button-login-regis" id="correo" name="correo" type="email" placeholder="Correo" autocomplete="off" value="{{ data.correo or '' }}">
+
+            <input class="button-login-regis" id="especialidad" name="especialidad" type="text" placeholder="Especialidad" list="recomendaciones-especialidades" autocomplete="off" value="{{ data.especialidad or '' }}">
             <datalist id="recomendaciones-especialidades">
                 {% for recomendacion in recomendaciones['especialidades'] %}
                     <option value="{{ recomendacion[0] }}">
                 {% endfor %}
             </datalist>
-            <input class="button-login-regis" id="usuario" name="usuario" type="text" placeholder="Usuario" autocomplete="off">
+
+            <input class="button-login-regis" id="usuario" name="usuario" type="text" placeholder="Usuario" autocomplete="off" value="{{ data.usuario or '' }}">
+
             <div class="buttons-menu">
-                <button class="ingresar button-menu">Buscar</button>
-                <button class="ingresar button-menu">Nuevo</button>
-                <button type="submit" class="ingresar button-menu">Editar</button>
+                {% if data.nombre is not defined or data.nombre == '' %}
+                    <button id="nuevo" name="accion" type="button" value="nuevo" class="ingresar button-menu" onclick="return logicaBotones('nuevo')">Nuevo</button>
+                {% endif %}
+
+
+                {% if data.nombre is not defined or data.nombre == '' %}
+                    <button id="buscar" name="accion" value="buscar" class="ingresar button-menu"  onclick="return logicaBotones('buscar')">Buscar</button>
+                {% endif %}
+
+                {% if data.nombre %}
+                    <button id="editar" name="accion" type="button" value="editar" class="ingresar button-menu" onclick="return logicaBotones('editar')">Editar</button>
+                {% endif %}
+
+                <button id="guardar" name="accion" value="guardar" class="ingresar button-menu" onclick="return validarContenido(campos); logicaBotones('guardar'); ">Guardar</button>
+                
+                <button id="actualizar"  name="accion" value="actualizar" class="ingresar button-menu" onclick="return logicaBotones('actualizar')">Actualizar</button>
+
+                <button id="x" name="accion" value="x" class="ingresar button-menu" onclick="return logicaBotones('x')">X</button>
+                
+                <button  class="ingresar button-menu" type="button" onclick="recargarPagina('medicos')">Cancelar</button>
             </div>
+
+            <input type="hidden" id="datosOriginales" name="datosOriginales">
+
         </form>
     </div>
 </body>

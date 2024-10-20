@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/usuario.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/SearchAndResultsForm.js') }}"></script>
+
     <script>
         let campos = {{ lista_de_campos | tojson }};
     </script>
@@ -50,7 +50,7 @@
         </form> 
     </div>                                  
     <div class="content-regis">
-        <form id="formUsuario" action="/usuario" method="post" onsubmit="">
+        <form id="form" action="/usuario" method="post">
             <input class="button-login-regis" type="text" placeholder="Usuario" name="usuario" id="usuario" minlength="5" maxlength="10" autocomplete="off" value="{{ usuario }}">
             <input class="button-login-regis" type="number" placeholder="Cedula" name="cedula" id="cedula" value="{{ cedula }}" minlength="5" autocomplete="off">         
             <input class="button-login-regis" placeholder="Telefono" id="telefono" value="{{ telefono }}" type="text" name="telefono" autocomplete="off">        
@@ -58,17 +58,22 @@
             <input class="button-login-regis" id="contraseña" value="{{ contraseña }}" type="password" placeholder="Contraseña" name="contraseña" autocomplete="off">
             <input class="button-login-regis" id="confirmar_contraseña" value="{{ confirmar_contraseña }}" type="password" placeholder="Confirmar contraseña" name="confirmar_contraseña" autocomplete="off">
             <div class="buttons-menu">
-                <button id="nuevo" name="accion" type="button" value="nuevo" class="ingresar button-menu" onclick="return logicaBotones('nuevo')">Nuevo</button>
+                {% if usuario == '' %}
+                     <button id="nuevo" name="accion" type="button" value="nuevo" class="ingresar button-menu" onclick="return logicaBotones('nuevo')">Nuevo</button>
+                {% endif %}
+
                 {% if usuario == '' %}
                     <button id="buscar" name="accion" value="buscar" class="ingresar button-menu"  onclick="return logicaBotones('buscar')">Buscar</button>
                 {% endif %}
+
                 {% if usuario %}
                     <button id="editar" name="accion" type="button" value="editar" class="ingresar button-menu" onclick="return logicaBotones('editar')">Editar</button>
                 {% endif %}
+
                 <button id="guardar" name="accion" value="guardar" class="ingresar button-menu" onclick="return validarContenido(campos); logicaBotones('guardar'); ">Guardar</button>
                 <button id="x" name="accion" value="x" class="ingresar button-menu" onclick="return logicaBotones('x')">X</button>
                 <button id="actualizar"  name="accion" value="actualizar" class="ingresar button-menu" onclick="return logicaBotones('actualizar')">Actualizar</button>
-                <button  class="ingresar button-menu" type="button" onclick="recargarPagina()">Cancelar</button>
+                <button  class="ingresar button-menu" type="button" onclick="recargarPagina('usuario')">Cancelar</button>
 
             </div>
             <input type="hidden" id="datosOriginales" name="datosOriginales">

@@ -1,4 +1,6 @@
+from collections import defaultdict
 from db import DataBase
+
 class DataAccess:
     def __init__(self):
         self.db = DataBase()
@@ -88,12 +90,49 @@ class DataAccess:
         row['result-busqueda'] = usuario
         return row
     
+    def busquedaMedico(self,data):
+        query = self.db.consultas['busqueda_medico']
+        medico = self.db.select(query,data)[0]
+        
+        row = {}
+        row['result-busqueda'] = medico
+        return row
+    
+    def busquedaPaciente(self,data):
+        query = self.db.consultas['busqueda_paciente']
+        medico = self.db.select(query,data)[0]
+        
+        row = {}
+        row['result-busqueda'] = medico
+        return row
+    
+    def busquedaCitas(self,data):
+        query = self.db.consultas['busqueda_citas']
+        citas = self.db.select(query,data)
+        
+        row = {}
+        row['result-busqueda'] = citas
+        return row
+    
+    
 # Actualizaciones
     def actualizarUsuario(self,data):
         update = self.db.actualizar['actualizar_usuario']
         usuario = self.db.update(update,data)
         
-        return 'Data actualizada correctamente'
+        return usuario
+    
+    def actualizarMedico(self,data):
+        update = self.db.actualizar['actualizar_medico']
+        medico = self.db.update(update,data)
+        
+        return medico
+    
+    def actualizarPaciente(self,data):
+        update = self.db.actualizar['actualizar_paciente']
+        paciente = self.db.update(update,data)
+        
+        return paciente
 
 # Insertaciones
     def crearUsuario(self, data):
@@ -101,5 +140,76 @@ class DataAccess:
         insert = self.db.insert(query_insert,data)
         
         return insert
+    
+    def crearMedico(self, data):
+        query_insert = self.db.inserts['dataMedicos']
+        insert = self.db.insert(query_insert,data)
+        
+        return insert
+    
+    def crearPaciente(self, data):
+        query_insert = self.db.inserts['dataPacientes']
+        insert = self.db.insert(query_insert,data)
+        
+        return insert
 
+# Limpieza de datos
+
+
+    def estructurar_medicos(self,resultado_query):
+        # Diccionario para agrupar médicos por cédula
+        medicos_dict = defaultdict(lambda: {
+            "nombre": "",
+            "especialidad": "",
+            "horarios": [],
+            "citas": []
+        })
+
+        for fila in resultado_query:
+            # Verificar si la fila tiene 8 o 7 valores
+            if len(fila) == 8:
+                cedula, nombre_medico, especialidad, dia, inicio, fin, fecha, hora_llegada = fila
+            elif len(fila) == 7:
+                cedula, nombre_medico, especialidad, dia, inicio, fin, fecha = fila
+                hora_llegada = None
+            else:
+                raise ValueError("La fila no tiene el número correcto de columnas.")
+            
+            # Si este médico ya existe en el diccionario, solo agregamos horarios y citas
+            if not medicos_dict[cedula]["nombre"]:
+                medicos_dict[cedula]["nombre"] = nombre_medico
+                medicos_dict[cedula]["especialidad"] = especialidad
+
+            # Agregar horario si no está duplicado
+            horario = {"dia": dia, "inicio": inicio, "fin": fin}
+            if horario not in medicos_dict[cedula]["horarios"]:
+                medicos_dict[cedula]["horarios"].append(horario)
+
+            # Agregar cita si no está duplicada
+            if fecha and hora_llegada:
+                cita = {"fecha": str(fecha), "hora": str(hora_llegada)}
+                if cita not in medicos_dict[cedula]["citas"]:
+                    medicos_dict[cedula]["citas"].append(cita)
+
+        # Convertir el diccionario en una lista de médicos con la estructura deseada y orden de claves
+        medicos_estructurados = []
+        for cedula, datos in medicos_dict.items():
+            medico_ordenado = {
+                "id": cedula,  # Primer campo
+                "nombre": datos["nombre"],  # Segundo campo
+                "especialidad": datos["especialidad"],  # Tercer campo
+                "horarios": datos["horarios"],  # Cuarto campo
+                "citas": datos["citas"]  # Quinto campo
+            }
+            medicos_estructurados.append(medico_ordenado)
+
+        return medicos_estructurados
+
+
+    
+    def estructurar_especialidades(self,query_especialidades):
+        especialidades = []
+        for especialidad in query_especialidades: 
+            especialidades.append(especialidad[0])
+        return especialidades
 

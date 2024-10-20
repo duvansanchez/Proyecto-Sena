@@ -24,12 +24,21 @@ class DataBase:
         self.consultas = {
             "especialidades":"SELECT especialidad FROM especialidades",
             "nacionalidades":"SELECT nacionalidad FROM nacionalidades",
-            "generos":"SELECT genero from generos",
+            "generos":"SELECT genero FROM generos",
             "doctors":"SELECT * FROM medicos",
-            "busqueda_usuario":"SELECT * from usuarios WHERE usuario = ? or cedula = ?"
+            "busqueda_usuario":"SELECT * FROM usuarios WHERE usuario = ? or cedula = ?",
+            "busqueda_medico":"SELECT * FROM medicos WHERE nombre = ? or cedula = ?",
+            "busqueda_paciente":"SELECT * FROM pacientes WHERE tipo_identificacion = ? and cedula = ?",
+            "busqueda_citas":"SELECT c1.fecha,c1.hora_llegada,c1.codigo_paciente,c1.nombre_paciente,c1.medico,c1.nombre_medico,c1.salas,m1.especialidad FROM citas c1 INNER JOIN medicos m1 on c1.medico = m1.cedula WHERE c1.fecha = ?"
         }
         self.actualizar = {
-            "actualizar_usuario": "UPDATE [dbo].[Usuarios] SET [usuario] = ?, [cedula] = ?, [telefono] = ?, [correo] = ?, [contraseña] = ? WHERE usuario = ? and cedula = ?"
+            "actualizar_usuario": "UPDATE [dbo].[Usuarios] SET [usuario] = ?, [cedula] = ?, [telefono] = ?, [correo] = ?, [contraseña] = ? WHERE usuario = ? and cedula = ?",
+            
+            "actualizar_medico":"UPDATE [dbo].[Medicos] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ?, [especialidad] = ?, [usuario] = ? WHERE usuario = ? and cedula = ?",
+            
+            "actualizar_paciente":"UPDATE [dbo].[Pacientes] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ? WHERE tipo_identificacion = ? and cedula = ?"
+
+
         }
    
     def conexiondb(self):
@@ -63,12 +72,12 @@ class DataBase:
             # Cierra el cursor y la conexión
             cursor.close()
             conexion.close()
-            return "Insert hecho correctamente"
+            return True  
 
         except Exception as e:
             cursor.close()
             conexion.close()
-            return "No se pudo realizar el insert"
+            return True  
 
     def update(self, update, values):
         cursor, conexion = self.conexiondb()
@@ -76,11 +85,9 @@ class DataBase:
         try:
             cursor.execute(update, values)
             conexion.commit()
-            print("Update hecho correctamente")
-            return True  # Indica que la operación fue exitosa
+            return True  
         except Exception as e:
-            print(f"Error al actualizar los datos: {e}")
-            return False  # Indica que la operación falló
+            return False  
         finally:
             cursor.close()
             conexion.close()

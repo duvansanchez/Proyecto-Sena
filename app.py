@@ -80,22 +80,20 @@ def usuario():
             if len(data_usuario) != 0:
                 flash('Ya existe un usuario con ese user')
                 return redirect(url_for('usuario'))  
-            
+
             if len(data_usuarioid) != 0:
                 flash('Ya existe un usuario con esa cedula')
                 return redirect(url_for('usuario'))  
             
-            
             data_insert = [data['usuario'],data['cedula'],data['telefono'],data['correo'],data['contraseña']]
             insert_usuario = dataQuery.crearUsuario(data_insert)
             
-            if insert_usuario == 'Insert hecho correctamente':
+            if insert_usuario == True:
                 flash('Usuario creado correctamente')
                 return redirect(url_for('usuario'))
             else:
                 flash('No se pudo realizar el insert')
-                return redirect(url_for('usuario'))
-                
+                return redirect(url_for('usuario')) 
        
         elif accion == 'buscar':
             parametros = [usuario,cedula_usuario]
@@ -146,7 +144,6 @@ def usuario():
 def pacientes():
     usuario_login = session.get('usuario')
 
-    # NUEVO
     lista_de_campos = ['nombre', 'apellidos','nacimiento','tipo_identificacion', 'cedula', 'telefono', 'genero', 'nacionalidad','direccion','correo']
     recomendaciones = {}
     generos = dataQuery.generos()
@@ -154,34 +151,90 @@ def pacientes():
     recomendaciones.setdefault('generos',generos)
     recomendaciones.setdefault('nacionalidades',nacionalidades)
 
+    data = {}
+    
 
     if request.method == 'POST':
-        data = {}
+        accion = request.form.get('accion')
 
         for campo in request.form:
             data[campo] = request.form[campo]
         
-        #Validar si ya existe el paciente
-        paciente = data['cedula']
-        data_paciente = list(dataQuery.validarPaciente(paciente))[0][0]
-        if len(data_paciente) != 0:
-            flash('Ya existe un paciente con ese código.')
-            return redirect(url_for('pacientes'))        
-                
-        #Insertar paciente
-        insert = db.inserts['dataPacientes']
-        data_insert = [data['nombre'],data['apellidos'],data['nacimiento'],data['tipo_identificacion'],data['cedula'],data['telefono'],data['genero'],data['nacionalidad'],data['direccion'],data['correo']]
-        db.insert(insert,data_insert)
+        tipo_identificacion = data['tipo_identificacion']
+        cedula_paciente = data['cedula']
         
-    return render_template('pacientes.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login)
+        if accion == 'guardar':
+            validar_paciente = dataQuery.validarPaciente(cedula_paciente)['data']
+
+            if validar_paciente != '':
+                flash('Ya existe un paciente con ese código.')
+                return redirect(url_for('pacientes'))        
+                    
+            data_insert = [data['nombre'],data['apellidos'],data['nacimiento'],data['tipo_identificacion'],data['cedula'],data['telefono'],data['genero'],data['nacionalidad'],data['direccion'],data['correo']]
+            insert_paciente = data.crearPaciente(data_insert)
+           
+            if insert_paciente == True:
+                flash('Paciente creado correctamente')
+                return redirect(url_for('pacientes'))
+            else:
+                flash('No se pudo realizar el insert')
+                return redirect(url_for('pacientes')) 
+            
+        elif accion == 'buscar':
+            parametros = [tipo_identificacion,cedula_paciente]
+            buscar_paciente = dataQuery.busquedaPaciente(parametros)['result-busqueda']
+            
+            if buscar_paciente[0] == '':
+                flash('No existe un paciente con esa cedula')
+                return redirect(url_for('pacientes'))
+            else:
+                data_busqueda = {
+                    'nombre': buscar_paciente[0],
+                    'apellidos': buscar_paciente[1],
+                    'nacimiento': buscar_paciente[2],
+                    'tipo_identificacion': buscar_paciente[3],
+                    'cedula': buscar_paciente[4],
+                    'telefono': buscar_paciente[5],
+                    'nacionalidad': buscar_paciente[6],
+                    'genero': buscar_paciente[7],
+                    'direccion': buscar_paciente[8],
+                    'correo': buscar_paciente[9]
+                }
+                return render_template('pacientes.html',  
+                                    lista_de_campos=lista_de_campos, 
+                                    usuario_login=usuario_login,
+                                    recomendaciones=recomendaciones,
+                                    data=data_busqueda
+                                    )   
+        elif accion == 'actualizar':
+            data_original = json.loads(data['datosOriginales'])
+            parametros = (data['nombre'], data['apellidos'], data['nacimiento'], data['tipo_identificacion'], data['cedula'], data['telefono'], data['genero'], data['nacionalidad'], data['direccion'], data['correo'], data_original['tipo_identificacion'], data_original['cedula'])
+
+            
+            actualizar_paciente = dataQuery.actualizarPaciente(parametros)
+            
+            if actualizar_paciente == False:
+                flash('No se actualizaron los datos')
+                return redirect(url_for('pacientes'))
+            else:
+                flash('Datos actualizados correctamente')
+                return render_template('pacientes.html',  
+                                    lista_de_campos=lista_de_campos, 
+                                    usuario_login=usuario_login,
+                                    recomendaciones=recomendaciones,
+                                    data=data
+                                    )
+        else:
+            print("No se reconoció la acción")
+        
+        
+    return render_template('pacientes.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data)
 
 @app.route('/medicos', methods=['GET','POST'])
 @login_required
 def medicos():
     usuario_login = session.get('usuario')
-    doctors = dataQuery.doctors()
-    print(doctors)
-    # NUEVO
+
     lista_de_campos = ['nombre', 'apellidos','nacimiento','tipo_identificacion', 'cedula', 'telefono', 'genero', 'nacionalidad','direccion','correo','especialidad','usuario']
     recomendaciones = {}
     generos = dataQuery.generos()
@@ -191,32 +244,89 @@ def medicos():
     recomendaciones.setdefault('especialidades',especialidades)
     recomendaciones.setdefault('nacionalidades',nacionalidades)
 
+    data = {}
+
     if request.method == 'POST':
-        data = {}
+        accion = request.form.get('accion')
+
         for campo in request.form:
             data[campo] = request.form[campo]
-
-        medico = data['cedula']
+        
+        medico = data['nombre']
+        cedula_medico = data['cedula']
         medicoUser = data['usuario']
 
-        consultar_medico = dataQuery.validarMedico(opcion=1,data=medico)['data']
-        consultar_medico_user = dataQuery.validarMedico(opcion=2,data=medicoUser)['data']
-        print(f'"{len(consultar_medico)}"')
-        print(f'"{len(consultar_medico_user)}"')
-        
-        if consultar_medico != '':
-            flash('Ya existe un medico con esa cedula')
-            return redirect(url_for('medicos'))  
+        if accion == 'guardar':
+            consultar_medico = dataQuery.validarMedico(opcion=1,data=cedula_medico)['data']
+            consultar_medico_user = dataQuery.validarMedico(opcion=2,data=medicoUser)['data']
+            
+            if consultar_medico != '':
+                flash('Ya existe un medico con esa cedula')
+                return redirect(url_for('medicos'))  
 
-        if consultar_medico_user != '':
-            flash('Ya existe un medico con ese usuario')
-            return redirect(url_for('medicos'))  
+            if consultar_medico_user != '':
+                flash('Ya existe un medico con ese usuario')
+                return redirect(url_for('medicos'))
+            
+            data_insert = [data['nombre'],data['apellidos'],data['nacimiento'],data['tipo_identificacion'],data['cedula'],data['telefono'],data['genero'],data['nacionalidad'],data['direccion'],data['correo'],data['especialidad'],data['usuario']]
+            insert_medico = dataQuery.crearMedico(data_insert)
+            
+            if insert_medico == True:
+                flash('Medico creado correctamente')
+                return redirect(url_for('medicos'))
+            else:
+                flash('No se pudo realizar el insert')
+                return redirect(url_for('medicos')) 
+              
+        elif accion == 'buscar':
+            parametros = [medico,cedula_medico]
+            buscar_medico = dataQuery.busquedaMedico(parametros)['result-busqueda']
+            
+            if buscar_medico[0] == '':
+                flash('No existe un medico con ese nombre o con esa cedula')
+                return redirect(url_for('medicos'))
+            else:
+                data_busqueda = {
+                    'nombre': buscar_medico[0],
+                    'apellidos': buscar_medico[1],
+                    'nacimiento': buscar_medico[2],
+                    'tipo_identificacion': buscar_medico[3],
+                    'cedula': buscar_medico[4],
+                    'telefono': buscar_medico[5],
+                    'genero': buscar_medico[6],
+                    'nacionalidad': buscar_medico[7],
+                    'direccion': buscar_medico[8],
+                    'correo': buscar_medico[9],
+                    'especialidad': buscar_medico[10],
+                    'usuario': buscar_medico[11]
+                }
+                return render_template('medicos.html',  
+                                    lista_de_campos=lista_de_campos, 
+                                    usuario_login=usuario_login,
+                                    recomendaciones=recomendaciones,
+                                    data=data_busqueda
+                                    )   
+        elif accion == 'actualizar':     
+            data_original = json.loads(data['datosOriginales'])
+            parametros = (data['nombre'],data['apellidos'],data['nacimiento'],data['tipo_identificacion'],data['cedula'],data['telefono'],data['genero'],data['nacionalidad'],data['direccion'],data['correo'],data['especialidad'],data['usuario'],data_original['usuario'],data_original['cedula'])
+            
+            actualizar_medico = dataQuery.actualizarMedico(parametros)
+            
+            if actualizar_medico == False:
+                flash('No se actualizaron los datos')
+                return redirect(url_for('medicos'))
+            else:
+                flash('Datos actualizados correctamente')
+                return render_template('medicos.html',  
+                                    lista_de_campos=lista_de_campos, 
+                                    usuario_login=usuario_login,
+                                    recomendaciones=recomendaciones,
+                                    data=data
+                                    )
+        else:
+            print("No se reconoció la acción")
         
-        insert = db.inserts['dataMedicos']
-        data_insert = [data['nombre'],data['apellidos'],data['nacimiento'],data['tipo_identificacion'],data['cedula'],data['telefono'],data['genero'],data['nacionalidad'],data['direccion'],data['correo'],data['especialidad'],data['usuario']]
-        db.insert(insert,data_insert)
-        
-    return render_template('medicos.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login)
+    return render_template('medicos.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data)
 
 @app.route('/salas', methods=['GET','POST'])
 @login_required
@@ -244,8 +354,130 @@ def buscador():
 
     #EDITAR
     lista_de_campos = ['sala-med','medicos']
-    
+
     return render_template('buscador.html',lista_de_campos=lista_de_campos)
+
+
+# Ruta para renderizar la plantilla con las citas
+@app.route('/citas', methods=['GET','POST'])
+@login_required
+def citas_medicas():
+    usuario_login = session.get('usuario')
+    citas = [{
+                'id': '',
+                'fecha': '',
+                'hora_llegada': '',
+                'codigo_paciente': '',
+                'nombre_paciente': '',
+                'medico': '',
+                'nombre_medico': '',
+                'sala': '',
+                'especialidad':''
+            }]
+    
+    if request.method == 'POST':
+        data = {}
+        
+        for campo in request.form:
+            data[campo] = request.form[campo]
+            
+        fecha_citas = data['fecha_citas']
+        buscar_citas = dataQuery.busquedaCitas(fecha_citas)['result-busqueda']
+                
+        citas = []
+
+        if buscar_citas[0] == '':
+            flash('No existen citas en esa fecha')
+            return redirect(url_for('citas'))
+        else:
+            for cita in buscar_citas:
+                paciente_cita= {
+                    'fecha': cita[0],
+                    'hora_llegada': cita[1],
+                    'codigo_paciente': cita[2],
+                    'nombre_paciente': cita[3],
+                    'medico': cita[4],
+                    'nombre_medico': cita[5],
+                    'sala': cita[6],
+                    'especialidad':cita[7]
+                }
+                citas.append(paciente_cita)
+                    
+        print(fecha_citas)
+        return render_template('citas.html', usuario_login=usuario_login,fecha_citas=fecha_citas, citas=citas)   
+    
+    return render_template('citas.html', usuario_login=usuario_login,citas=citas, fecha_citas='')   
+   
+# Ruta para renderizar la plantilla con las citas
+@app.route('/crearcitas', methods=['GET','POST'])
+@login_required
+def crearcitas():
+    usuario_login = session.get('usuario')
+    
+    query_citas= db.select("SELECT me.cedula, CONCAT(me.nombre,' ',me.apellidos) nombre,me.especialidad, ho.dia, ho.inicio, ho.fin, ci.fecha, ci.hora_llegada FROM Medicos me INNER JOIN Horarios_Medicos ho ON ho.cedula = me.cedula INNER JOIN Citas ci on ci.medico = me.cedula")
+    citas_medicos = dataQuery.estructurar_medicos(query_citas)
+    
+    query_especialidades = db.select("SELECT especialidad FROM Especialidades")
+    especialidades = dataQuery.estructurar_especialidades(query_especialidades)
+    
+    pacientes = [
+    {
+        "id": 1,
+        "nombre": "Juan Carlos Pérez",
+        "cedula": "123456789",
+        "fecha_nacimiento": "1985-06-12",
+        "telefono": "3123456789",
+        "direccion": "Calle 12 #34-56",
+        "email": "juan.perez@example.com"
+    },
+    {
+        "id": 2,
+        "nombre": "Ana María López",
+        "cedula": "987654321",
+        "fecha_nacimiento": "1990-09-23",
+        "telefono": "3156789123",
+        "direccion": "Carrera 45 #67-89",
+        "email": "ana.lopez@example.com"
+    },
+    {
+        "id": 3,
+        "nombre": "Carlos Ramírez",
+        "cedula": "456123789",
+        "fecha_nacimiento": "1987-01-30",
+        "telefono": "3101234567",
+        "direccion": "Calle 45 #12-34",
+        "email": "carlos.ramirez@example.com"
+    }
+    ]
+        
+    if request.method == 'POST':
+        accion = request.form.get('accion')
+        
+        data = {}
+        for campo in request.form:
+            data[campo] = request.form[campo]
+        
+        if accion == 'buscar_paciente':
+            tipo_identificacion = 'CC' 
+            cedula_paciente = data['cedula']
+            parametros = [tipo_identificacion,cedula_paciente]
+            
+            buscar_paciente = dataQuery.busquedaPaciente(parametros)['result-busqueda']
+            
+            if buscar_paciente[0] == '':
+                flash('No existe un paciente con esa cedula')
+                return redirect(url_for('crearcitas'))
+            else:
+                cedula = buscar_paciente[4]
+                nombre = buscar_paciente[0]
+                apellidos = buscar_paciente[1]
+                
+                data_busqueda = f"{cedula} {nombre} {apellidos}"
+                return render_template('crearcitas.html',usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos,nombre_paciente=data_busqueda)   
+            
+    
+
+    return render_template('crearcitas.html', usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos )  
 
 if __name__ ==  '__main__': 
     app.run(host='localhost',port=5000,debug=True) 

@@ -54,7 +54,7 @@ function ocultarError() {
 }
 function logicaBotones(button){
     console.log(`button en accion ${button}`)
-    
+
     if (button == 'nuevo'){
         let buscar = document.getElementById("buscar");
         buscar.style.display = "none";
@@ -65,7 +65,7 @@ function logicaBotones(button){
     }
 
     if (button == 'buscar'){
-   
+
     }  
 
     if (button == 'editar'){
@@ -76,16 +76,16 @@ function logicaBotones(button){
         let actualizar = document.getElementById("actualizar");
         actualizar.style.setProperty("display", "inline", "important");
 
-        let x = document.getElementById("xe");
+        let x = document.getElementById("x");
         x.style.setProperty("display", "inline", "important");
 
-        valoresOriginales = {
-          usuario: document.getElementById("usuario").value,
-          cedula: document.getElementById("cedula").value,
-          telefono: document.getElementById("telefono").value,
-          correo: document.getElementById("correo").value,
-          contrasena: document.getElementById("contraseña").value
-        };
+        let form = document.getElementById('form');
+
+        let valoresOriginales = {};
+        form.querySelectorAll('input').forEach(input => {
+          valoresOriginales[input.id] = input.value;
+        });
+
         document.getElementById("datosOriginales").value = JSON.stringify(valoresOriginales);
         console.log(`Valores originales guardados: ${JSON.stringify(valoresOriginales)}`);
     
@@ -101,32 +101,40 @@ function logicaBotones(button){
     }    
     
     if (button == 'actualizar'){
-        valoresModificados = {
-          usuario: document.getElementById("usuario").value,
-          cedula: document.getElementById("cedula").value,
-          telefono: document.getElementById("telefono").value,
-          correo: document.getElementById("correo").value,
-          contrasena: document.getElementById("contraseña").value
-        };
-        console.log(`Valores modificados: ${JSON.stringify(valoresModificados)}`);
+
     }
 
   return true;  // Esto permite que el formulario se envíe
 
 }
-function recargarPagina() {
-  // Redirigir al endpoint original (ruta) como si fuera una nueva carga desde el servidor
-  window.location.href = '/usuario';  // Cambia '/usuario' por la ruta de tu página
+function recargarPagina(ruta) {
+  window.location.href = `/${ruta}`;  
 }
+// function filtrarCitas() {
+//   const searchInput = document.getElementById('searchInput');
+//   const citasBody = document.getElementById('citasBody');
+//   const noResults = document.getElementById('noResults');
 
+//   const busqueda = searchInput.value.toLowerCase();
+//   const filas = citasBody.getElementsByTagName('tr');
+//   let resultadosEncontrados = false;
 
-// window.addEventListener('beforeunload', function () {
-//   // Redirigir al endpoint inicial cada vez que se intente recargar la página
-//   console.log("recargando datos")
-//   window.location.href = '/usuario';  // Esto garantiza que la página cargue desde el servidor
-// });
+//   for (let fila of filas) {
+//       const doctor = fila.getElementsByTagName('td')[1].textContent.toLowerCase();
+//       if (doctor.includes(busqueda)) {
+//           fila.classList.remove('hidden');
+//           resultadosEncontrados = true;
+//       } else {
+//           fila.classList.add('hidden');
+//       }
+//   }
+
+//   noResults.classList.toggle('hidden', resultadosEncontrados);
+// }
+// searchInput.addEventListener('input', filtrarCitas);
 
 window.validarContenido = validarContenido;
 window.ocultarError = ocultarError;
 window.logicaBotones = logicaBotones;
 window.recargarPagina = recargarPagina;
+window.filtrarCitas = filtrarCitas;

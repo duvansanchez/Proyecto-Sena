@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citas Médicas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/citas.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+</head>
+<body >
+    <div class="content-titulo">
+        <h1 class="titulo text-3xl font-bold text-center text-blue-600 mb-8">Citas Médicas</h1>
+        <p class="usuario-name">{{ usuario_login }}</p>
+        <span class="material-symbols-outlined" id="home">
+            cabin
+        </span>
+        <form action="/usuario"  method="post" class="salir-form" id="salir-form">
+            <button class="ingresar button-menu salir">Salir</button>
+        </form> 
+    </div>  
+    <form id="formCitas" action="/citas" method="post">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-4">
+                <label for="fecha_citas" class="block text-lg font-extrabold text-gray-700 uppercase mb-2" style="color: #27bbdf;">Fecha Citas</label>
+                <input type="date" id="fecha_citas" name="fecha_citas" value="{{fecha_citas}}" class="mt-1 block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="p-4">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Buscar por nombre del doctor..." class="w-full pl-10 pr-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500" />
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="color-main">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-base font-extrabold text-white uppercase tracking-wider">Paciente</th>
+                                <th class="px-6 py-3 text-left text-base font-extrabold text-white uppercase tracking-wider">Doctor</th>
+                                <th class="px-6 py-3 text-left text-base font-extrabold text-white uppercase tracking-wider">Especialidad</th>
+                                <th class="px-6 py-3 text-left text-base font-extrabold text-white uppercase tracking-wider">Sala</th>
+                                <th class="px-6 py-3 text-left text-base font-extrabold text-white uppercase tracking-wider">Hora Llegada</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="citasBody">
+                            {% for cita in citas %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ cita.codigo_paciente }} - {{ cita.nombre_paciente }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ cita.medico }} - {{ cita.nombre_medico}}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ cita.especialidad }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ cita.sala }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ cita.hora_llegada }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <p id="noResults" class="mt-4 text-center text-gray-500 hidden">No se encontraron citas para este doctor.</p>
+        </div>
+    </form>    
+    <script>
+        document.getElementById('fecha_citas').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('formCitas').submit();
+            }
+        });
+    </script>
+     
+    
+</body>
+</html>
