@@ -13,10 +13,6 @@ app.config.from_object(Config)
 db = DataBase()
 dataQuery = DataAccess()
 
-# @app.route('/static/js/<path:filename>')
-# def serve_js(filename):
-#     return send_from_directory('static/js', filename, mimetype='application/javascript')
-
 # DECORADORES
 def login_required(f):
     @wraps(f)
@@ -415,10 +411,10 @@ def crearcitas():
     usuario_login = session.get('usuario')
     
     query_citas= db.select("SELECT me.cedula, CONCAT(me.nombre,' ',me.apellidos) nombre,me.especialidad, ho.dia, ho.inicio, ho.fin, ci.fecha, ci.hora_llegada FROM Medicos me INNER JOIN Horarios_Medicos ho ON ho.cedula = me.cedula INNER JOIN Citas ci on ci.medico = me.cedula")
-    citas_medicos = dataQuery.estructurar_medicos(query_citas)
+    citas_medicos = dataQuery.estructurarMedicos(query_citas)
     
     query_especialidades = db.select("SELECT especialidad FROM Especialidades")
-    especialidades = dataQuery.estructurar_especialidades(query_especialidades)
+    especialidades = dataQuery.estructurarEspecialidades(query_especialidades)
     
     pacientes = [
     {
@@ -457,7 +453,7 @@ def crearcitas():
         for campo in request.form:
             data[campo] = request.form[campo]
         
-        if accion == 'buscar_paciente':
+        if accion == "buscar_paciente":
             tipo_identificacion = 'CC' 
             cedula_paciente = data['cedula']
             parametros = [tipo_identificacion,cedula_paciente]
@@ -473,11 +469,47 @@ def crearcitas():
                 apellidos = buscar_paciente[1]
                 
                 data_busqueda = f"{cedula} {nombre} {apellidos}"
-                return render_template('crearcitas.html',usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos,nombre_paciente=data_busqueda)   
+                return render_template('crearcitas.html',usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos,nombre_paciente=data_busqueda)  
+             
+        elif accion == "crear_cita":
+            query = db.inserts['crear_cita']
+            data = dataQuery.prepararDatosCitas(data)
+            insert = db.insert(query,data)
             
-    
+            if insert is True:
+                flash('Cita creada con exito')
+                return redirect(url_for('crearcitas'))
+            else:
+                flash('No se pudo crear la cita medica')
+                return redirect(url_for('crearcitas'))
 
     return render_template('crearcitas.html', usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos )  
 
+# Ruta para renderizar la plantilla con las citas
+@app.route('/crearhorarios', methods=['GET','POST'])
+@login_required
+def crearhorarios():
+    usuario_login = session.get('usuario')
+
+    query_medicos = db.select("SELECT nombre,apellidos,cedula,especialidad FROM Medicos")
+    medicos = []
+    for index, (nombre, apellido, cedula, especialidad) in enumerate(query_medicos, start=1):
+        medico = {
+            "id": index,
+            "nombre": f"Dr. {nombre.strip()} {apellido.strip()}",
+            "cedula":cedula,
+            "especialidad": especialidad
+        }
+        medicos.append(medico)
+    
+    query_especialidades = db.select("SELECT especialidad FROM Especialidades")
+    especialidades = dataQuery.estructurarEspecialidades(query_especialidades)
+    
+    query_horarios_medicos = db.select("SELECT dia,inicio,fin,cedula FROM Horarios_Medicos")
+    horarios_medicos = ''
+    if query_horarios_medicos[0][0] != '':
+        horarios_medicos = dataQuery.estructurarHorarios(query_horarios_medicos)
+
+    return render_template('crearhorarios.html',usuario_login=usuario_login, medicos=medicos, especialidades=especialidades,horarios_medicos=horarios_medicos)  
 if __name__ ==  '__main__': 
     app.run(host='localhost',port=5000,debug=True) 

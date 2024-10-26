@@ -5,7 +5,8 @@ class DataBase:
         self.inserts = {
             "dataUsuarios":"EXECUTE dbo.dataUsuarios @usuario=?, @cedula=?,@telefono=?,@correo=?,@contraseña=?",
             "dataPacientes":"EXECUTE dbo.dataPacientes @nombre = ?, @apellidos = ?, @nacimiento = ?, @tipo_identificacion = ?, @cedula = ?, @telefono = ?, @genero = ?, @nacionalidad = ?, @direccion = ?, @correo = ?",
-            "dataMedicos":"EXECUTE dbo.dataMedicos @nombre=?,@apellidos=?,@nacimiento=?,@tipo_identificacion=?,@cedula=?,@telefono=?,@genero=?,@nacionalidad=?,@direccion=?,@correo=?,@especialidad=?,@usuario=?"
+            "dataMedicos":"EXECUTE dbo.dataMedicos @nombre=?,@apellidos=?,@nacimiento=?,@tipo_identificacion=?,@cedula=?,@telefono=?,@genero=?,@nacionalidad=?,@direccion=?,@correo=?,@especialidad=?,@usuario=?",
+            "crear_cita":"INSERT INTO [dbo].[Citas] ([fecha], [hora_llegada], [codigo_paciente], [nombre_paciente], [medico], [nombre_medico]) VALUES (?, ?, ?, ?, ?, ?);"
         }
 
         self.updates = {
@@ -37,8 +38,6 @@ class DataBase:
             "actualizar_medico":"UPDATE [dbo].[Medicos] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ?, [especialidad] = ?, [usuario] = ? WHERE usuario = ? and cedula = ?",
             
             "actualizar_paciente":"UPDATE [dbo].[Pacientes] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ? WHERE tipo_identificacion = ? and cedula = ?"
-
-
         }
    
     def conexiondb(self):
@@ -75,9 +74,10 @@ class DataBase:
             return True  
 
         except Exception as e:
+            print(f"Error al crear la cita: {e}")
             cursor.close()
             conexion.close()
-            return True  
+            return False  
 
     def update(self, update, values):
         cursor, conexion = self.conexiondb()

@@ -100,10 +100,10 @@ class DataAccess:
     
     def busquedaPaciente(self,data):
         query = self.db.consultas['busqueda_paciente']
-        medico = self.db.select(query,data)[0]
+        paciente = self.db.select(query,data)[0]
         
         row = {}
-        row['result-busqueda'] = medico
+        row['result-busqueda'] = paciente
         return row
     
     def busquedaCitas(self,data):
@@ -154,9 +154,7 @@ class DataAccess:
         return insert
 
 # Limpieza de datos
-
-
-    def estructurar_medicos(self,resultado_query):
+    def estructurarMedicos(self,resultado_query):
         # Diccionario para agrupar médicos por cédula
         medicos_dict = defaultdict(lambda: {
             "nombre": "",
@@ -204,12 +202,44 @@ class DataAccess:
             medicos_estructurados.append(medico_ordenado)
 
         return medicos_estructurados
-
-
     
-    def estructurar_especialidades(self,query_especialidades):
+    def estructurarEspecialidades(self,query_especialidades):
         especialidades = []
         for especialidad in query_especialidades: 
             especialidades.append(especialidad[0])
         return especialidades
+
+    def estructurarHorarios(self,horarios):
+        horariosDoctores = []
+        for dia, inicio, fin, cedula in horarios:
+            horario = {
+                'cedula': cedula,
+                'dia': dia,
+                'inicio': inicio,
+                'fin': fin
+            }
+            horariosDoctores.append(horario)
+        return horariosDoctores
+    
+    def prepararDatosCitas(self,data):
+        codigo_paciente, nombre_paciente = data['nombre_paciente'].split(' ', 1)
+        medico_id, nombre_medico = data['nombre_medico'].split(' - ', 1)
+        data = {
+            'fecha': data['fecha_cita'],
+            'hora_llegada': data['hora_cita'],
+            'codigo_paciente': codigo_paciente,
+            'nombre_paciente': nombre_paciente,
+            'medico': medico_id.strip(),  
+            'nombre_medico': nombre_medico.strip()  
+        }
+        valores = (
+            data['fecha'],
+            data['hora_llegada'],
+            data['codigo_paciente'],
+            data['nombre_paciente'],
+            data['medico'],
+            data['nombre_medico']
+        )
+        return valores
+
 
