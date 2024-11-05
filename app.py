@@ -51,6 +51,7 @@ def login():
 
     return render_template('login.html')
 
+#TODO CONTRASEÑA ENCRIPTADA Y CONFIRMAR CONTRASEÑA
 @app.route('/usuario', methods=['GET','POST'])
 @login_required
 def usuario():
@@ -115,7 +116,7 @@ def usuario():
             
             actualizar_usuario = dataQuery.actualizarUsuario(parametros)
             
-            if len(actualizar_usuario) == 0:
+            if not actualizar_usuario:
                 flash('No se actualizaron los datos')
                 return redirect(url_for('usuario'))
             else:
@@ -135,6 +136,7 @@ def usuario():
     
     return render_template('usuario.html', lista_de_campos=lista_de_campos, usuario_login=usuario_login,usuario='',cedula='',telefono='',correo='',contraseña='')
 
+# TODO PARA QUE CARGUEN LOS TIPOS DE CC
 @app.route('/pacientes', methods=['GET','POST'])
 @login_required
 def pacientes():
@@ -143,6 +145,7 @@ def pacientes():
     lista_de_campos = ['nombre', 'apellidos','nacimiento','tipo_identificacion', 'cedula', 'telefono', 'genero', 'nacionalidad','direccion','correo']
     recomendaciones = {}
     generos = dataQuery.generos()
+    # TODO CARGAR MAS NACIONALIDADES
     nacionalidades = dataQuery.nacionalidades()
     recomendaciones.setdefault('generos',generos)
     recomendaciones.setdefault('nacionalidades',nacionalidades)
@@ -167,7 +170,7 @@ def pacientes():
                 return redirect(url_for('pacientes'))        
                     
             data_insert = [data['nombre'],data['apellidos'],data['nacimiento'],data['tipo_identificacion'],data['cedula'],data['telefono'],data['genero'],data['nacionalidad'],data['direccion'],data['correo']]
-            insert_paciente = data.crearPaciente(data_insert)
+            insert_paciente = dataQuery.crearPaciente(data_insert)
            
             if insert_paciente == True:
                 flash('Paciente creado correctamente')
@@ -179,9 +182,10 @@ def pacientes():
         elif accion == 'buscar':
             parametros = [tipo_identificacion,cedula_paciente]
             buscar_paciente = dataQuery.busquedaPaciente(parametros)['result-busqueda']
+            print(buscar_paciente)
             
             if buscar_paciente[0] == '':
-                flash('No existe un paciente con esa cedula')
+                flash('No existe un paciente con ese tipo de documento y cedula')
                 return redirect(url_for('pacientes'))
             else:
                 data_busqueda = {
@@ -228,6 +232,7 @@ def pacientes():
 
 @app.route('/medicos', methods=['GET','POST'])
 @login_required
+# TODO PARA QUE CARGUEN LOS TIPOS DE CC
 def medicos():
     usuario_login = session.get('usuario')
 
@@ -235,6 +240,7 @@ def medicos():
     recomendaciones = {}
     generos = dataQuery.generos()
     especialidades = dataQuery.especialidades()
+    # TODO CARGAR MAS NACIONALIDADES
     nacionalidades = dataQuery.nacionalidades()
     recomendaciones.setdefault('generos',generos)
     recomendaciones.setdefault('especialidades',especialidades)
@@ -337,22 +343,6 @@ def salas():
     #EDITAR
     lista_de_campos = ['sala-med','medicos']
     return render_template('salas.html',lista_de_campos=lista_de_campos)
-
-@app.route('/buscador', methods=['GET','POST'])
-@login_required
-def buscador():
-    usuario_login = session.get('usuario')
-
-    if request.method == 'POST':
-        data = {}
-        for campo in request.form:
-            data[campo] = request.form[campo]
-
-    #EDITAR
-    lista_de_campos = ['sala-med','medicos']
-
-    return render_template('buscador.html',lista_de_campos=lista_de_campos)
-
 
 # Ruta para renderizar la plantilla con las citas
 @app.route('/citas', methods=['GET','POST'])
@@ -483,7 +473,7 @@ def crearcitas():
                 flash('No se pudo crear la cita medica')
                 return redirect(url_for('crearcitas'))
 
-    return render_template('crearcitas.html', usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos )  
+    return render_template('crearcitas.html', usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos)  
 
 # Ruta para renderizar la plantilla con las citas
 @app.route('/crearhorarios', methods=['GET','POST'])
@@ -496,7 +486,8 @@ def crearhorarios():
     for index, (nombre, apellido, cedula, especialidad) in enumerate(query_medicos, start=1):
         medico = {
             "id": index,
-            "nombre": f"Dr. {nombre.strip()} {apellido.strip()}",
+            "nombre": nombre,
+            "apellido": apellido,
             "cedula":cedula,
             "especialidad": especialidad
         }
@@ -505,11 +496,46 @@ def crearhorarios():
     query_especialidades = db.select("SELECT especialidad FROM Especialidades")
     especialidades = dataQuery.estructurarEspecialidades(query_especialidades)
     
-    query_horarios_medicos = db.select("SELECT dia,inicio,fin,cedula FROM Horarios_Medicos")
+    query_horarios_medicos = db.select("SELECT ho.dia,ho.inicio,ho.fin,m1.nombre,ho.cedula FROM Horarios_Medicos ho LEFT JOIN Medicos m1 ON m1.cedula = ho.cedula")
     horarios_medicos = ''
     if query_horarios_medicos[0][0] != '':
         horarios_medicos = dataQuery.estructurarHorarios(query_horarios_medicos)
 
+    if request.method == 'POST':
+        horarios = request.form.getlist('horarios[]')  # Recibe todos los inputs con el name 'horarios[]'
+        print(f'Horarios encontrados {horarios}')
+        
+        horarios_decodificados = [json.loads(horario) for horario in horarios][0]
+        print(f'Horarios decodificados {horarios_decodificados}')
+
+        for horario in horarios_decodificados:
+            parametros_validacion = [horario['cedula'],horario['dia']]
+            validar_horario = dataQuery.validarHorarios(parametros_validacion)['data'][0]
+            nuevo_horario = [horario['dia'], horario['inicio'], horario['fin'], horario['medico'], horario['cedula']]
+            
+            # Validar si ya tiene un horario creado
+            if validar_horario != '':
+                eliminar_horario = dataQuery.eliminarHorario([horario['cedula'],horario['dia']])
+                insert_horario = dataQuery.crearHorario(nuevo_horario)
+                if insert_horario:
+                    flash('Horario creado con exito')
+                    return redirect(url_for('crearhorarios'))   
+                else:
+                    flash('No se pudo crear el horario')
+                    return redirect(url_for('crearhorarios'))                                       
+
+            else:
+                insert_horario = dataQuery.crearHorario(nuevo_horario)
+                if insert_horario:
+                    flash('Horario creado con exito')
+                    return redirect(url_for('crearhorarios'))   
+                else:
+                    flash('No se pudo crear el horario')
+                    return redirect(url_for('crearhorarios'))       
+                 
+        flash(f'Horarios medicos actualizados')
+        return redirect(url_for('crearhorarios'))  
+    
     return render_template('crearhorarios.html',usuario_login=usuario_login, medicos=medicos, especialidades=especialidades,horarios_medicos=horarios_medicos)  
 if __name__ ==  '__main__': 
     app.run(host='localhost',port=5000,debug=True) 

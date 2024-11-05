@@ -20,8 +20,7 @@
 
 </head>
 <body>
-
-    
+    {# FIXME ARREGLAR ESTILO DE ALERTAS #}
     <div class="errores">
             <form action="/usuario" method="post" onsubmit="return ocultarError()" class="form-error">
                 <div class="error" id="error">
@@ -35,7 +34,6 @@
                     <button type="submit" id="boton-cerrar">X</button>  
                     <script>
                         let boton_cerrar = document.getElementById("boton-cerrar");
-                        console.log(boton_cerrar)
                         boton_cerrar.style.setProperty("display", "block", "important");
                     </script>
                     {% endif %}
@@ -68,7 +66,7 @@
                 {% endif %}
 
                 {% if usuario == '' %}
-                    <button id="buscar" name="accion" value="buscar" class="ingresar button-menu"  onclick="return logicaBotones('buscar')">Buscar</button>
+                    <button title="Busca por usuario o cedula" id="buscar" name="accion" value="buscar" class="ingresar button-menu"  onclick="return logicaBotones('buscar')">Buscar</button>
                 {% endif %}
 
                 {% if usuario %}
@@ -76,8 +74,8 @@
                 {% endif %}
 
                 <button id="guardar" name="accion" value="guardar" class="ingresar button-menu" onclick="return validarContenido(campos); logicaBotones('guardar'); ">Guardar</button>
-                <button id="x" name="accion" value="x" class="ingresar button-menu" onclick="return logicaBotones('x')">X</button>
                 <button id="actualizar"  name="accion" value="actualizar" class="ingresar button-menu" onclick="return logicaBotones('actualizar')">Actualizar</button>
+                <button id="x" name="accion" value="x" class="ingresar button-menu" onclick="return logicaBotones('x')">X</button>
                 <button  class="ingresar button-menu" type="button" onclick="recargarPagina('usuario')">Cancelar</button>
 
             </div>

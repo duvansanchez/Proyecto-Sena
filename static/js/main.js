@@ -1,51 +1,60 @@
 import { ponerMayusculas } from "./resources.js";
 
-let valoresOriginales = {};
-
 function validarContenido(campos) {
-  try{
+  try {
     let enviarContenido = true;
     let mensajeError = document.getElementById("error");
     let botonCerrar = document.getElementById("boton-cerrar");
-    
-    console.log("Probando validacion")
+    let guardar = document.getElementById("guardar");
+
+    console.log("Probando validacion");
 
     try {
       let camposVacios = [];
-      
+
+      // Revisa todos los campos proporcionados
       campos.forEach(function (campo) {
         let valor = document.getElementById(campo).value;
         if (valor === "") {
           camposVacios.push(campo);
           enviarContenido = false;
+          guardar.disabled = true; 
         }
       });
 
       if (enviarContenido === false) {
         let errorCampos = "Debe de llenar los campos:";
 
-        camposVacios.forEach(function (campo) {    
-            let campoClean = campo    
-            
-            if (campo.includes("_")) {
-              campoClean = campo.replace(/_/g, " ");
-            }
+        camposVacios.forEach(function (campo) {
+          let campoClean = campo;
 
-            let formatError = `${errorCampos} <br> ${ponerMayusculas(campoClean)}`;
-            errorCampos = formatError;
+          if (campo.includes("_")) {
+            campoClean = campo.replace(/_/g, " ");
+          }
+
+          let formatError = `${errorCampos} <br> ${ponerMayusculas(campoClean)}`;
+          errorCampos = formatError;
         });
+        
         mensajeError.innerHTML = errorCampos;
-        mensajeError.style.display = "block"; 
-        botonCerrar.style.display = "block"; 
+        mensajeError.style.display = "block";
+
+        setTimeout(function () {
+          mensajeError.style.display = "none";
+          guardar.disabled = false; 
+        }, 5000);
       }
+
       return enviarContenido;
     } catch (error) {
-        alert(error);
+      alert(error);
     }
-  }catch (error) {
+  } catch (error) {
     alert(error);
   }
 }
+
+
 function ocultarError() {
   document.getElementById("error").style.display = "none"; 
   let botonCerrar = document.getElementById("boton-cerrar");
@@ -110,31 +119,9 @@ function logicaBotones(button){
 function recargarPagina(ruta) {
   window.location.href = `/${ruta}`;  
 }
-// function filtrarCitas() {
-//   const searchInput = document.getElementById('searchInput');
-//   const citasBody = document.getElementById('citasBody');
-//   const noResults = document.getElementById('noResults');
 
-//   const busqueda = searchInput.value.toLowerCase();
-//   const filas = citasBody.getElementsByTagName('tr');
-//   let resultadosEncontrados = false;
-
-//   for (let fila of filas) {
-//       const doctor = fila.getElementsByTagName('td')[1].textContent.toLowerCase();
-//       if (doctor.includes(busqueda)) {
-//           fila.classList.remove('hidden');
-//           resultadosEncontrados = true;
-//       } else {
-//           fila.classList.add('hidden');
-//       }
-//   }
-
-//   noResults.classList.toggle('hidden', resultadosEncontrados);
-// }
-// searchInput.addEventListener('input', filtrarCitas);
 
 window.validarContenido = validarContenido;
 window.ocultarError = ocultarError;
 window.logicaBotones = logicaBotones;
 window.recargarPagina = recargarPagina;
-window.filtrarCitas = filtrarCitas;

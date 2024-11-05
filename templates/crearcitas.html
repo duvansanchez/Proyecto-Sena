@@ -132,7 +132,6 @@
 
         let currentWeekStartDate; // Variable para controlar la semana actual en el calendario
 
-        // Función para cargar las especialidades en el selector
         function cargarEspecialidades() {
             const especialidadSelect = document.getElementById('especialidad');
             especialidadSelect.innerHTML = '<option value="">Seleccione Especialidad</option>';
@@ -144,7 +143,6 @@
             });
         }
 
-        // Función para cargar los médicos según la especialidad seleccionada
         function cargarMedicosPorEspecialidad(especialidadSeleccionada) {
             const medicoSelect = document.getElementById('medico');
             medicoSelect.innerHTML = '<option value="">Seleccione un Médico</option>';
@@ -192,9 +190,8 @@
         }
 
         // Función para mostrar el calendario del médico seleccionado
-        function mostrarCalendarioMedico(medicoId, fechaInicioSemana = new Date()) {
-            const medico = medicos.find(m => m.id == medicoId);
-            console.log(medico)
+        function mostrarCalendarioMedico(medicoCedula, fechaInicioSemana = new Date()) {
+            const medico = medicos.find(m => m.id == medicoCedula);
             if (medico) {
                 console.log('Médico seleccionado:', medico);
                 const horarioContainer = document.getElementById('horarioMedicoContainer');
@@ -226,6 +223,7 @@
                 // Generar las horas de trabajo del médico durante la semana
                 const horasTrabajo = {};
                 medico.horarios.forEach(horario => {
+                    console.log('Imprimiento horarios', horario);
                     const indiceDia = diasSemana.indexOf(horario.dia);
                     if (indiceDia !== -1) {
                         const horas = generarHoras(horario.inicio, horario.fin);
@@ -306,19 +304,12 @@
             }
         }
 
-
-        // Event Listeners
-        //document.addEventListener('DOMContentLoaded', habilitarCampos);
-
-        // Escuchar el evento 'input' para que se ejecute cada vez que se escriba en el campo
-
         document.addEventListener('DOMContentLoaded', () => {
             cargarEspecialidades();
 
             document.getElementById('especialidad').addEventListener('change', (e) => {
                 const especialidadSeleccionada = e.target.value;
                 cargarMedicosPorEspecialidad(especialidadSeleccionada);
-                // Limpiar selección de médico
                 document.getElementById('medico').value = '';
                 document.getElementById('medico').disabled = !especialidadSeleccionada;
                 // Ocultar calendario y limpiar nombre del médico
@@ -328,9 +319,9 @@
 
             document.getElementById('medico').addEventListener('change', (e) => {
                 currentWeekStartDate = new Date(); // Reiniciar a la semana actual
-                const medicoId = e.target.value;
-                if (medicoId) {
-                    mostrarCalendarioMedico(medicoId, currentWeekStartDate);
+                const medicoCedula = e.target.value;
+                if (medicoCedula) {
+                    mostrarCalendarioMedico(medicoCedula, currentWeekStartDate);
                 } else {
                     // Ocultar calendario y limpiar nombre del médico
                     document.getElementById('horarioMedicoContainer').style.display = 'none';

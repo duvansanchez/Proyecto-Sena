@@ -6,7 +6,8 @@ class DataBase:
             "dataUsuarios":"EXECUTE dbo.dataUsuarios @usuario=?, @cedula=?,@telefono=?,@correo=?,@contraseña=?",
             "dataPacientes":"EXECUTE dbo.dataPacientes @nombre = ?, @apellidos = ?, @nacimiento = ?, @tipo_identificacion = ?, @cedula = ?, @telefono = ?, @genero = ?, @nacionalidad = ?, @direccion = ?, @correo = ?",
             "dataMedicos":"EXECUTE dbo.dataMedicos @nombre=?,@apellidos=?,@nacimiento=?,@tipo_identificacion=?,@cedula=?,@telefono=?,@genero=?,@nacionalidad=?,@direccion=?,@correo=?,@especialidad=?,@usuario=?",
-            "crear_cita":"INSERT INTO [dbo].[Citas] ([fecha], [hora_llegada], [codigo_paciente], [nombre_paciente], [medico], [nombre_medico]) VALUES (?, ?, ?, ?, ?, ?);"
+            "crear_cita":"INSERT INTO [dbo].[Citas] ([fecha], [hora_llegada], [codigo_paciente], [nombre_paciente], [medico], [nombre_medico]) VALUES (?, ?, ?, ?, ?, ?);",
+            "crear_horario":"INSERT INTO [dbo].[Horarios_Medicos] ([dia], [inicio], [fin], [medico], [cedula]) VALUES (?, ?, ?, ?, ?);"
         }
 
         self.updates = {
@@ -19,7 +20,8 @@ class DataBase:
             "validarUsuarioId":"SELECT TOP 1 cedula FROM usuarios where cedula = ?",
             "validarMedico":"SELECT TOP 1 cedula FROM medicos where cedula = ?",
             "validarMedicoUser":"SELECT TOP 1 usuario FROM medicos where usuario = ?",
-            "validarLogin":"SELECT TOP 1 usuario FROM usuarios where usuario = ? and contraseña = ?"
+            "validarLogin":"SELECT TOP 1 usuario FROM usuarios where usuario = ? and contraseña = ?",
+            "validarHorario":"SELECT TOP 1 cedula,dia FROM Horarios_Medicos WHERE cedula = ? and dia = ?"
         }
    
         self.consultas = {
@@ -38,6 +40,9 @@ class DataBase:
             "actualizar_medico":"UPDATE [dbo].[Medicos] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ?, [especialidad] = ?, [usuario] = ? WHERE usuario = ? and cedula = ?",
             
             "actualizar_paciente":"UPDATE [dbo].[Pacientes] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ? WHERE tipo_identificacion = ? and cedula = ?"
+        }
+        self.deletes = {
+            "deleteHorarios":"DELETE FROM Horarios_Medicos WHERE cedula = ? and dia = ?"
         }
    
     def conexiondb(self):
@@ -62,19 +67,14 @@ class DataBase:
         cursor, conexion = self.conexiondb()
 
         try:
-            obtener = cursor.execute(insert,values)
-
-            # Confirma los cambios en la base de datos    
+            cursor.execute(insert,values)
             conexion.commit()
-
-
-            # Cierra el cursor y la conexión
             cursor.close()
             conexion.close()
             return True  
 
         except Exception as e:
-            print(f"Error al crear la cita: {e}")
+            print(f"Error al realizar el insert: {e}")
             cursor.close()
             conexion.close()
             return False  
@@ -87,6 +87,7 @@ class DataBase:
             conexion.commit()
             return True  
         except Exception as e:
+            print(f"Error al actualizar datos: {e}")
             return False  
         finally:
             cursor.close()
@@ -97,9 +98,7 @@ class DataBase:
 
         try:
             cursor.execute(query, values)
-
             resultados = cursor.fetchall()  
-            
             if len(resultados) == 0:
                 return [['']]
             else:
@@ -109,6 +108,20 @@ class DataBase:
 
         finally:
             # Cerrar el cursor y la conexión siempre, independientemente de si hubo un error
+            cursor.close()
+            conexion.close()
+
+    def delete(self, query, values=()):
+        cursor, conexion = self.conexiondb()
+        
+        try:
+            cursor.execute(query, values)
+            conexion.commit()
+            return True
+        except Exception as e:
+            print(f"Error al eliminar datos: {e}")
+            return False
+        finally:
             cursor.close()
             conexion.close()
 

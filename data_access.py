@@ -60,6 +60,14 @@ class DataAccess:
         row['data'] = resultado
         return row
     
+    def validarHorarios(self,data):
+        query = self.db.validadores['validarHorario']
+        resultado = self.db.select(query,data)[0]
+
+        row = {}
+        row['data'] = resultado
+        return row
+    
 # Cargar informacion por defecto
     def especialidades(self):
         query = self.db.consultas['especialidades']
@@ -114,6 +122,7 @@ class DataAccess:
         row['result-busqueda'] = citas
         return row
     
+
     
 # Actualizaciones
     def actualizarUsuario(self,data):
@@ -149,6 +158,12 @@ class DataAccess:
     
     def crearPaciente(self, data):
         query_insert = self.db.inserts['dataPacientes']
+        insert = self.db.insert(query_insert,data)
+        
+        return insert
+   
+    def crearHorario(self, data):
+        query_insert = self.db.inserts['crear_horario']
         insert = self.db.insert(query_insert,data)
         
         return insert
@@ -211,12 +226,13 @@ class DataAccess:
 
     def estructurarHorarios(self,horarios):
         horariosDoctores = []
-        for dia, inicio, fin, cedula in horarios:
+        for dia, inicio, fin, nombre, cedula in horarios:
             horario = {
                 'cedula': cedula,
                 'dia': dia,
                 'inicio': inicio,
-                'fin': fin
+                'fin': fin,
+                'medico': nombre
             }
             horariosDoctores.append(horario)
         return horariosDoctores
@@ -242,4 +258,9 @@ class DataAccess:
         )
         return valores
 
-
+# Eliminar datos
+    def eliminarHorario(self,data):
+        query_delete = self.db.deletes['deleteHorarios']
+        delete = self.db.delete(query_delete,data)
+        
+        return delete
