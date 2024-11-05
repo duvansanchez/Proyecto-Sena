@@ -17,10 +17,12 @@
     background-color: #e5e7eb;
 }
 .calendar-cell {
-    background-color: #fff;
-    min-height: 80px;
+    background-color: #43f546;
+    text-align: center;
+    border: 1px solid #acb1cc;
+    min-height: 30px;
     position: relative;
-    padding: 4px;
+    padding: 1px;
     cursor: pointer;
 }
 .calendar-cell.disabled {
@@ -43,6 +45,7 @@
 }
 .day-header {
     text-align: center;
+    border: 1px solid #acb1cc;
     font-weight: bold;
     padding: 8px 0;
     background-color: #f3f4f6;

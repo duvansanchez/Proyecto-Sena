@@ -41,12 +41,11 @@
             <button class="ingresar button-menu salir">Salir</button>
         </form> 
     </div>  
-    <div class="container mx-auto px-4 py-8">
-        
+    <div class="container mx-auto px-4 py-8">     
         <!-- Crear Nueva Cita -->
         <div class="bg-white shadow-md rounded-lg overflow-hidden max-w-2xl mx-auto mb-8">
             <h2 class="color-main-text text-center text-xl font-bold p-4 bg-blue-50 text-blue-700  ">Crear Cita</h2>
-            <form id="formularioCita" class="p-4 space-y-4" method="post">
+            <form id="formularioCita" class="p-5 space-y-5" method="post">
                 <!-- Campos de fecha y hora seleccionadas -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -104,12 +103,12 @@
         </div>
 
         <!-- Calendario del Médico Seleccionado -->
-        <div id="horarioMedicoContainer" class="bg-white shadow-md rounded-lg overflow-hidden max-w-4xl mx-auto" style="display: none;">
+        <div id="horarioMedicoContainer" class="bg-white shadow-md rounded-lg overflow-hidden max-w-3xl mx-auto" style="display: none;">
             <h2 class="color-main-text text-xl font-semibold p-4 bg-blue-50 text-blue-700">Calendario del Médico Seleccionado</h2>
-            <div class="p-4">
+            <div class="p-8">
                 <div class="calendar-navigation">
                     <button class="color-main" id="prevWeekBtn">&larr; Semana Anterior</button>
-                    <span id="currentWeekLabel"></span>
+                    <span id="currentWeekLabel" style="text-align:center;"></span>
                     <button class="color-main" id="nextWeekBtn">Semana Siguiente &rarr;</button>
                 </div>
                 <div id="horarioMedico">
@@ -120,9 +119,6 @@
     </div>
 
     <script>
-        // Datos de pacientes cargados desde el backend
-        //const pacientes = {{ pacientes|tojson|safe }};
-
         // Datos de especialidades y médicos cargados desde el backend
         const especialidades = {{ especialidades|tojson|safe }};
         console.log('Especialidades:', especialidades);
@@ -220,19 +216,18 @@
                 });
                 horarioMedico.appendChild(headers);
 
-                // Generar las horas de trabajo del médico durante la semana
+                // Generar las horas de trabajo del médico durante la semana, horasTrabajo variable que contiene las horas en las que va a trabajar el medico
                 const horasTrabajo = {};
                 medico.horarios.forEach(horario => {
-                    console.log('Imprimiento horarios', horario);
                     const indiceDia = diasSemana.indexOf(horario.dia);
                     if (indiceDia !== -1) {
                         const horas = generarHoras(horario.inicio, horario.fin);
                         horasTrabajo[indiceDia] = horas;
                     }
                 });
+                console.log('Validar horas trabajo', horasTrabajo);
 
-                // Obtener todas las horas posibles (asumiendo de 08:00 a 18:00)
-                const horasDelDia = generarHoras('08:00', '18:00');
+                const horasDelDia = generarHoras('00:00', '23:00');
 
                 // Crear las celdas del calendario
                 horasDelDia.forEach(hora => {
@@ -243,13 +238,24 @@
                         const cell = document.createElement('div');
                         cell.className = 'calendar-cell';
 
-                        const fechaCelda = semana[i];
-                        const fechaString = fechaCelda.toISOString().split('T')[0];
+                        const diaSemana = semana[i];
+                        const fechaString = diaSemana.toISOString().split('T')[0]; //2024-11-06
 
-                        const horaDisponible = horasTrabajo[fechaCelda.getDay()] && horasTrabajo[fechaCelda.getDay()].includes(hora);
-                        const citaOcupada = medico.citas.some(cita => cita.fecha === fechaString && cita.hora === hora);
+                        const horasDelDia = horasTrabajo[diaSemana.getDay()] || [];
+
+                        // Comparamos solo la hora sin minutos en el formato "HH:"
+                        const horaSinMinutos = hora.substring(0, 2) + ":";
+                        const horaDisponible = horasDelDia.some(horario =>
+                            horario.startsWith(horaSinMinutos)
+                        );
+                        const citaOcupada = medico.citas.some(cita => {
+                            const citaFecha = cita.fecha.split(' ')[0]; // Extrae solo la fecha sin la hora
+                            return citaFecha === fechaString && cita.hora === hora;
+                        });
+                        
 
                         if (!horaDisponible) {
+                            cell.textContent = 'Horario no asignado';
                             cell.classList.add('disabled');
                         }
                         if (citaOcupada) {
@@ -265,6 +271,7 @@
 
                         if (!horaDisponible && !citaOcupada) {
                             cell.textContent = '';
+                            cell.classList.add('disabled');
                         }
 
                         row.appendChild(cell);
@@ -352,7 +359,6 @@
                 });
 
                 // Llamar a la función cuando la página se cargue, por si el campo ya tiene un valor predefinido
-                
                 document.getElementById('nombre_paciente').addEventListener('input', habilitarCampos);
 
                 function habilitarCampos() {
@@ -370,7 +376,7 @@
                     }
                 }
                 habilitarCampos()
-            });
+        });
     </script>
 </body>
 </html>
