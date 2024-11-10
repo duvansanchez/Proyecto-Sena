@@ -28,6 +28,7 @@ class DataBase:
             "especialidades":"SELECT especialidad FROM especialidades",
             "nacionalidades":"SELECT nacionalidad FROM nacionalidades",
             "generos":"SELECT genero FROM generos",
+            "tipocc":"EXECUTE dbo.ObtenerDocumentos",
             "doctors":"SELECT * FROM medicos",
             "busqueda_usuario":"SELECT * FROM usuarios WHERE usuario = ? or cedula = ?",
             "busqueda_medico":"SELECT * FROM medicos WHERE nombre = ? or cedula = ?",

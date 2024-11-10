@@ -42,13 +42,13 @@ button{
     background-color: white;
     border-radius: 60px;
     width: 390px;
-    padding: 20px 23px;
+    padding: 14px 15px;
     padding-bottom: 11px;
-    margin: 20px 0;
+    margin: 15px 0;
     margin-right: 10px;
 }
 .button-login-regis::placeholder{
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 700;
     color: #0B004B;
 }
@@ -68,7 +68,8 @@ input[list]:focus, input[list]:hover {
 
 /* Definir estilos predeterminados para los inputs y links*/
 input{
-    font-size: 25px;
+    font-size: 20px;
+    color: #22088c;
     border: none; 
     padding: 0; 
     outline: 0;

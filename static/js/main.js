@@ -128,7 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 6000); // 6000 milisegundos = 6 segundos
   }
 });
-
+//Citas
+document.getElementById('fecha_citas').addEventListener('change', function() {
+  if (this.value) {
+      document.getElementById('formCitas').submit();
+  }
+});
 window.validarContenido = validarContenido;
 window.ocultarError = ocultarError;
 window.logicaBotones = logicaBotones;

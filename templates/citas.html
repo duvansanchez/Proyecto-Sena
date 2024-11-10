@@ -1,4 +1,4 @@
-{% from 'macros.html' import errores %}
+{% import 'macros.html' as macro %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -18,23 +18,15 @@
 
 </head>
 <body>
-    {{ errores() }}
+    {{ macro.errores() }}
 
-    <div class="content-titulo">
-        <h1 class="titulo text-3xl font-bold text-center text-blue-600 mb-8">Citas Médicas</h1>
-        <p class="usuario-name">{{ usuario_login }}</p>
-        <span class="material-symbols-outlined" id="home">
-            cabin
-        </span>
-        <form action="/usuario"  method="post" class="salir-form" id="salir-form">
-            <button class="ingresar button-menu salir">Salir</button>
-        </form> 
-    </div>  
+    {{ macro.encabezado_tailwind('Citas Médicas', usuario_login) }}
+
     <form id="formCitas" action="/citas" method="post">
         <div class="container mx-auto px-4 py-8">
             <div class="mb-4">
                 <label for="fecha_citas" class="block text-lg font-extrabold text-gray-700 uppercase mb-2" style="color: #27bbdf;">Fecha Citas</label>
-                <input type="date" id="fecha_citas" name="fecha_citas" value="{{fecha_citas}}" class="mt-1 block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="fecha_citas" name="fecha_citas" value="{{fecha_citas}}" class="mt-1 block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base">
             </div>
             
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -78,13 +70,5 @@
             <p id="noResults" class="mt-4 text-center text-gray-500 hidden">No se encontraron citas para este doctor.</p>
         </div>
     </form>    
-    <script>
-        document.getElementById('fecha_citas').addEventListener('change', function() {
-            if (this.value) {
-                document.getElementById('formCitas').submit();
-            }
-        });
-    </script>
-     
 </body>
 </html>

@@ -1,3 +1,5 @@
+{% import 'macros.html' as macro %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,10 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pacientes.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script>
-        let campos = {{ lista_de_campos | tojson }};
-        console.log(campos)
-    </script>
+    <script>let campos = {{ lista_de_campos | tojson }};</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -22,40 +21,21 @@
 
 </head>
 <body>
-    <div class="errores">
-        <form action="/pacientes" method="post" onsubmit="return ocultarError()" class="form-error">
-            <div class="error" id="error">
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                  <ul>
-                    {% for message in messages %}
-                      <li>{{ message }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-                {% endwith %} 
-            </div>
-            <button type="submit" id="boton-cerrar">X</button>  
-            
-        </form>
-    </div>
-    <div class="content-titulo">
-        <h1 class="titulo">Pacientes</h1>
-        <p class="usuario-name">{{ usuario_login }}</p>
+    {{ macro.errores() }}
 
-        <form action="/medicos"  method="post" class="salir-form" id="salir-form">
-            <button class="ingresar button-menu salir">Salir</button>
-        </form>
-        <span class="material-symbols-outlined" id="home">
-            cabin
-        </span>
-    </div>
+    {{ macro.encabezado('Pacientes', usuario_login) }}
+    
     <div class="content-regis">
         <form id="form" action="/pacientes" method="post">
             <div class="inputs">
                 <input class="button-login-regis" id="nombre" name="nombre" type="text" placeholder="Nombre"  minlength="3" autocomplete="off" value="{{ data.nombre or '' }}">  
                 <input class="button-login-regis" id="apellidos" name="apellidos"  type="text" placeholder="Apellidos"  minlength="5" autocomplete="off" value="{{ data.apellidos or '' }}">   
-                <input class="button-login-regis" id="tipo_identificacion" name="tipo_identificacion" type="text" placeholder="Tipo Identificacion" autocomplete="off" value="{{ data.tipo_identificacion or '' }}">
+                <input class="button-login-regis" id="tipo_identificacion" name="tipo_identificacion" type="text" list="recomendaciones-tipocc" placeholder="Tipo Identificacion" autocomplete="off" value="{{ data.tipo_identificacion or '' }}">
+                <datalist id="recomendaciones-tipocc">
+                    {% for recomendacion in recomendaciones['tipocc'] %}
+                    <option value="{{ recomendacion[0] }}">
+                    {% endfor %}
+                </datalist>
                 <input class="button-login-regis" id="cedula" name="cedula" type="text" placeholder="Cedula"  minlength="3" autocomplete="off" value="{{ data.cedula or '' }}">
                 <input class="button-login-regis" id="telefono" name="telefono" type="text" placeholder="Telefono - Celular" autocomplete="off" value="{{ data.telefono or '' }}">
                 <input class="button-login-regis" id="nacionalidad" name="nacionalidad" type="text" placeholder="Nacionalidad" list="recomendaciones-nacionalidades" autocomplete="off" value="{{ data.nacionalidad or '' }}">

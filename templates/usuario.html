@@ -1,3 +1,5 @@
+{% import 'macros.html' as macro %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/usuario.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-    <script>
-        let campos = {{ lista_de_campos | tojson }};
-    </script>
-    
+    <script>let campos = {{ lista_de_campos | tojson }};</script>
     <link rel="preconnect" href="https://fonts.googleapis.com" >
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -20,38 +18,10 @@
 
 </head>
 <body>
-    {# FIXME ARREGLAR ESTILO DE ALERTAS #}
-    <div class="errores">
-            <form action="/usuario" method="post" onsubmit="return ocultarError()" class="form-error">
-                <div class="error" id="error">
-                    {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    <ul>
-                        {% for message in messages %}
-                        <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                    <button type="submit" id="boton-cerrar">X</button>  
-                    <script>
-                        let boton_cerrar = document.getElementById("boton-cerrar");
-                        boton_cerrar.style.setProperty("display", "block", "important");
-                    </script>
-                    {% endif %}
-                    {% endwith %} 
-                </div>
-            </form>
-    </div> 
+    {{ macro.errores() }}
 
-    <div class="content-titulo">
-        <h1 class="titulo">Usuario</h1>
-        <p class="usuario-name">{{ usuario_login }}</p>
-        <span class="material-symbols-outlined" id="home">
-            cabin
-        </span>
-        <form action="/usuario"  method="post" class="salir-form" id="salir-form">
-            <button class="ingresar button-menu salir">Salir</button>
-        </form> 
-    </div>                                  
+    {{ macro.encabezado('Usuario', usuario_login) }}
+                         
     <div class="content-regis">
         <form id="form" action="/usuario" method="post">
             <input class="button-login-regis" type="text" placeholder="Usuario" name="usuario" id="usuario" minlength="5" maxlength="10" autocomplete="off" value="{{ usuario }}">
@@ -80,8 +50,6 @@
 
             </div>
             <input type="hidden" id="datosOriginales" name="datosOriginales">
-
-
         </form>
     </div>
 </body>

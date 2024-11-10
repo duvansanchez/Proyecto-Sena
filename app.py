@@ -1,6 +1,6 @@
-import sys
+# import sys
 import json
-from flask import Flask, render_template, request, session, flash, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, session, flash, redirect, url_for, send_from_directory, make_response
 from cryptography.fernet import Fernet
 from db import DataBase
 from config import Config
@@ -35,28 +35,42 @@ def login():
         clave = Fernet.generate_key()
         fernet = Fernet(clave)
         
-        usuario =  request.form['usuario']
-        contraseña = request.form['contraseña'].encode()
-        data_validate = [usuario,contraseña]
-        
-        validar_usuario = list(dataQuery.validarLogin(data=data_validate))[0][0]
+        usuario = request.form.get('usuario') if request.form.get('usuario') else ''
+        contraseña = request.form.get('contraseña').encode() if request.form.get('contraseña') else ''
 
-        if len(validar_usuario) == 0:
+        parametros = [usuario,contraseña]
+        validar_usuario = dataQuery.validarLogin(parametros)
+
+        if usuario == '' and contraseña == '':
+            session.pop('usuario', None)  # Elimina el usuario de la sesión
+            return redirect(url_for('login'))
+
+        if validar_usuario:
+            print('Credenciales correctas')
+            session['usuario'] = usuario  # Almacena el nombre de usuario en la sesión
+            return redirect(url_for('usuario'))
+        else:
             print('Credenciales incorrectas')
             flash('Credenciales incorrectas')
             return redirect(url_for('login'))  
-        else:
-            session['usuario'] = usuario  # Almacena el nombre de usuario en la sesión
-            return redirect(url_for('usuario'))
-
+        
     return render_template('login.html')
+
+@app.route('/home', methods=['GET','POST'])
+@login_required
+def home():
+    usuario_login = session.get('usuario')
+
+    response = make_response(render_template('home.html', usuario_login=usuario_login))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response
 
 #TODO CONTRASEÑA ENCRIPTADA Y CONFIRMAR CONTRASEÑA
 @app.route('/usuario', methods=['GET','POST'])
 @login_required
 def usuario():
     usuario_login = session.get('usuario')
-    
     lista_de_campos = ['usuario', 'cedula', 'telefono', 'correo', 'contraseña', 'confirmar_contraseña']
     
     if request.method == 'POST':
@@ -133,8 +147,10 @@ def usuario():
         else:
             print("No se reconoció la acción")
         
-    
-    return render_template('usuario.html', lista_de_campos=lista_de_campos, usuario_login=usuario_login,usuario='',cedula='',telefono='',correo='',contraseña='')
+    response = make_response(render_template('usuario.html', lista_de_campos=lista_de_campos, usuario_login=usuario_login,usuario='',cedula='',telefono='',correo='',contraseña=''))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response
 
 # TODO PARA QUE CARGUEN LOS TIPOS DE CC
 @app.route('/pacientes', methods=['GET','POST'])
@@ -145,13 +161,13 @@ def pacientes():
     lista_de_campos = ['nombre', 'apellidos','nacimiento','tipo_identificacion', 'cedula', 'telefono', 'genero', 'nacionalidad','direccion','correo']
     recomendaciones = {}
     generos = dataQuery.generos()
-    # TODO CARGAR MAS NACIONALIDADES
     nacionalidades = dataQuery.nacionalidades()
+    tipocc = dataQuery.tipocc()
     recomendaciones.setdefault('generos',generos)
     recomendaciones.setdefault('nacionalidades',nacionalidades)
+    recomendaciones.setdefault('tipocc',tipocc)
 
-    data = {}
-    
+    data = {} 
 
     if request.method == 'POST':
         accion = request.form.get('accion')
@@ -227,8 +243,10 @@ def pacientes():
         else:
             print("No se reconoció la acción")
         
-        
-    return render_template('pacientes.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data)
+    response = make_response(render_template('pacientes.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response    
 
 @app.route('/medicos', methods=['GET','POST'])
 @login_required
@@ -240,11 +258,12 @@ def medicos():
     recomendaciones = {}
     generos = dataQuery.generos()
     especialidades = dataQuery.especialidades()
-    # TODO CARGAR MAS NACIONALIDADES
     nacionalidades = dataQuery.nacionalidades()
+    tipocc = dataQuery.tipocc()
     recomendaciones.setdefault('generos',generos)
     recomendaciones.setdefault('especialidades',especialidades)
     recomendaciones.setdefault('nacionalidades',nacionalidades)
+    recomendaciones.setdefault('tipocc',tipocc)
 
     data = {}
 
@@ -327,8 +346,11 @@ def medicos():
                                     )
         else:
             print("No se reconoció la acción")
-        
-    return render_template('medicos.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data)
+    
+    response = make_response(render_template('medicos.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response   
 
 # @app.route('/salas', methods=['GET','POST'])
 # @login_required
@@ -386,11 +408,16 @@ def citas():
                     'especialidad': cita[6]
                 }
                 citas.append(paciente_cita)
-                    
-        print(fecha_citas)
-        return render_template('citas.html', usuario_login=usuario_login,fecha_citas=fecha_citas, citas=citas)   
+                
+        response = make_response(render_template('citas.html', usuario_login=usuario_login,fecha_citas=fecha_citas, citas=citas))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        return response                
     
-    return render_template('citas.html', usuario_login=usuario_login,citas=citas, fecha_citas='')   
+    response = make_response(render_template('citas.html', usuario_login=usuario_login,citas=citas, fecha_citas=''))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response       
    
 # Ruta para renderizar la plantilla con las citas
 @app.route('/crearcitas', methods=['GET','POST'])
@@ -403,36 +430,6 @@ def crearcitas():
     
     query_especialidades = db.select("SELECT especialidad FROM Especialidades")
     especialidades = dataQuery.estructurarEspecialidades(query_especialidades)
-    
-    pacientes = [
-    {
-        "id": 1,
-        "nombre": "Juan Carlos Pérez",
-        "cedula": "123456789",
-        "fecha_nacimiento": "1985-06-12",
-        "telefono": "3123456789",
-        "direccion": "Calle 12 #34-56",
-        "email": "juan.perez@example.com"
-    },
-    {
-        "id": 2,
-        "nombre": "Ana María López",
-        "cedula": "987654321",
-        "fecha_nacimiento": "1990-09-23",
-        "telefono": "3156789123",
-        "direccion": "Carrera 45 #67-89",
-        "email": "ana.lopez@example.com"
-    },
-    {
-        "id": 3,
-        "nombre": "Carlos Ramírez",
-        "cedula": "456123789",
-        "fecha_nacimiento": "1987-01-30",
-        "telefono": "3101234567",
-        "direccion": "Calle 45 #12-34",
-        "email": "carlos.ramirez@example.com"
-    }
-    ]
         
     if request.method == 'POST':
         accion = request.form.get('accion')
@@ -457,7 +454,10 @@ def crearcitas():
                 apellidos = buscar_paciente[1]
                 
                 data_busqueda = f"{cedula} {nombre} {apellidos}"
-                return render_template('crearcitas.html',usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos,nombre_paciente=data_busqueda)  
+                response = make_response(render_template('crearcitas.html',usuario_login=usuario_login, especialidades=especialidades, medicos=citas_medicos,nombre_paciente=data_busqueda))
+                response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+                response.headers['Pragma'] = 'no-cache'
+                return response      
              
         elif accion == "crear_cita":
             query = db.inserts['crear_cita']
@@ -471,12 +471,14 @@ def crearcitas():
                 flash('No se pudo crear la cita medica')
                 return redirect(url_for('crearcitas'))
 
-    return render_template('crearcitas.html', usuario_login=usuario_login, pacientes=pacientes, especialidades=especialidades, medicos=citas_medicos)  
+    response = make_response(render_template('crearcitas.html', usuario_login=usuario_login, especialidades=especialidades, medicos=citas_medicos)  )
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response   
 
 # Ruta para renderizar la plantilla con las citas
 @app.route('/crearhorarios', methods=['GET','POST'])
 @login_required
-#FIXME NO ESTAN ELIMINANDO LOS HORARIOS
 def crearhorarios():
     usuario_login = session.get('usuario')
 
@@ -502,17 +504,14 @@ def crearhorarios():
 
     if request.method == 'POST':
         horarios = request.form.getlist('horarios[]')  
-        print(f'Horarios encontrados {horarios}')
         
         horarios_decodificados = [json.loads(horario) for horario in horarios][0]
-        print(f'Horarios decodificados {horarios_decodificados}')
-
-        #Si el medico no tiene horarios decodificados entonces vaciar todos los horarios
+        
+        #Si el medico no tiene horario  entonces vaciar todos los horarios
         if horarios_decodificados == []:
             flash('El medico tiene que tener minimo un dia de horario creado')
             return redirect(url_for('crearhorarios'))   
         
-        #TODO PROBAR CUANDO NO HAYA NINGUN HORARIO
         cont_elim = 0
         for horario in horarios_decodificados:
             nuevo_horario = [horario['dia'], horario['inicio'], horario['fin'], horario['medico'], horario['cedula']]
@@ -524,39 +523,15 @@ def crearhorarios():
             insert_horario = dataQuery.crearHorario(nuevo_horario)
             if not insert_horario:
                 flash('No se pudo crear el horario')
-                return redirect(url_for('crearhorarios'))   
-           
-            # if insert_horario:
-            #     flash('Horario creado con exito')
-            #     return redirect(url_for('crearhorarios'))   
-            # else:
-            #     flash('No se pudo crear el horario')
-            #     return redirect(url_for('crearhorarios'))  
-
-            # # Validar si ya tiene un horario creado
-            # if validar_horario != '':
-            #     print("ELIMINANDO HORARIO")
-            #     eliminar_horario = dataQuery.eliminarHorario([horario['cedula'],horario['dia']])
-            #     insert_horario = dataQuery.crearHorario(nuevo_horario)
-            #     if insert_horario:
-            #         flash('Horario creado con exito')
-            #         return redirect(url_for('crearhorarios'))   
-            #     else:
-            #         flash('No se pudo crear el horario')
-            #         return redirect(url_for('crearhorarios'))                                       
-
-            # else:
-            #     insert_horario = dataQuery.crearHorario(nuevo_horario)
-            #     if insert_horario:
-            #         flash('Horario creado con exito')
-            #         return redirect(url_for('crearhorarios'))   
-            #     else:
-            #         flash('No se pudo crear el horario')
-            #         return redirect(url_for('crearhorarios'))       
+                return redirect(url_for('crearhorarios'))        
                  
         flash(f'Horarios medicos actualizados')
         return redirect(url_for('crearhorarios'))  
     
-    return render_template('crearhorarios.html',usuario_login=usuario_login, medicos=medicos, especialidades=especialidades,horarios_medicos=horarios_medicos)  
+    response = make_response(render_template('crearhorarios.html',usuario_login=usuario_login, medicos=medicos, especialidades=especialidades,horarios_medicos=horarios_medicos)  )
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    return response   
+ 
 if __name__ ==  '__main__': 
     app.run(host='localhost',port=5000,debug=True) 

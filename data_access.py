@@ -56,9 +56,10 @@ class DataAccess:
         query = self.db.validadores['validarLogin']
         resultado = self.db.select(query,data)[0][0]
 
-        row = {}
-        row['data'] = resultado
-        return row
+        if len(resultado) > 0:
+            return True
+        else:
+            return False
     
     def validarHorarios(self,data):
         query = self.db.validadores['validarHorario']
@@ -81,6 +82,11 @@ class DataAccess:
     
     def generos(self):
         query =  self.db.consultas['generos']
+        generos = self.db.select(query)
+        return generos
+    
+    def tipocc(self):
+        query =  self.db.consultas['tipocc']
         generos = self.db.select(query)
         return generos
     
