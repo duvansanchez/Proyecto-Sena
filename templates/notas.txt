@@ -9,6 +9,9 @@ Aprendizaje adquirido:
 - Todo fuera mas facil si las peticiones HTTP se realizan del front al backend por ejemplo con fetch, tanto como para validaciones y traspaso de los datos
 -La implementacion de un elemento HTML para enviar los datos originales antes de modificarlos, es de las cosas mas horrorosas que he podido codear, pero todo esto debido a la forma en la que se comunican el front y el backend, si fuera sido una relacion mas directa, todo fuera mas estetico y sobre todo mas facil
 -Las IA me han ayudado pero tambien han agregado codigo mas complejo y sin uso haciendo gastar tiempo en esto
+-Se creo el entorno incorrectamente, los archivos dentro de el entorno...
+--Ver si flask login fuera servido mas al deslogearse y otras clases como LoginManager, UserMixin, login_user, login_required, logout_user, current_user fueran servido mas
+
 
 seguridad
 versionamiento

@@ -1,5 +1,6 @@
 # import sys
 import json
+import bcrypt
 from flask import Flask, render_template, request, session, flash, redirect, url_for, send_from_directory, make_response
 from cryptography.fernet import Fernet
 from db import DataBase
@@ -32,29 +33,33 @@ def login():
         for campo in request.form:
             data[campo] = request.form[campo]
             
-        clave = Fernet.generate_key()
-        fernet = Fernet(clave)
-        
-        usuario = request.form.get('usuario') if request.form.get('usuario') else ''
-        contraseña = request.form.get('contraseña').encode() if request.form.get('contraseña') else ''
+        usuario = data.get('usuario', '')
+        contraseña = data.get('contraseña', '').encode('utf-8')  
 
-        parametros = [usuario,contraseña]
-        validar_usuario = dataQuery.validarLogin(parametros)
+        validar_usuario = dataQuery.validarLogin(usuario) 
 
-        if usuario == '' and contraseña == '':
-            session.pop('usuario', None)  # Elimina el usuario de la sesión
+        if not usuario or not contraseña:
+            session.pop('usuario', None)  # Elimina el usuario de la sesión si falta información
             return redirect(url_for('login'))
 
+        # Si el usuario es válido, verifica la contraseña con bcrypt
         if validar_usuario:
-            print('Credenciales correctas')
-            session['usuario'] = usuario  # Almacena el nombre de usuario en la sesión
-            return redirect(url_for('usuario'))
+            hashed_contraseña = validar_usuario['contraseña']  
+
+            # Verificación de la contraseña ingresada con bcrypt
+            if bcrypt.checkpw(contraseña, hashed_contraseña.encode('utf-8')):
+                print('Credenciales correctas')
+                session['usuario'] = usuario  # Almacena el nombre de usuario en la sesión
+                return redirect(url_for('usuario'))
+            else:
+                flash('Credenciales incorrectas')
         else:
-            print('Credenciales incorrectas')
             flash('Credenciales incorrectas')
-            return redirect(url_for('login'))  
+
+        return redirect(url_for('login'))
         
     return render_template('login.html')
+
 
 @app.route('/home', methods=['GET','POST'])
 @login_required
@@ -66,7 +71,6 @@ def home():
     response.headers['Pragma'] = 'no-cache'
     return response
 
-#TODO CONTRASEÑA ENCRIPTADA Y CONFIRMAR CONTRASEÑA
 @app.route('/usuario', methods=['GET','POST'])
 @login_required
 def usuario():
@@ -83,6 +87,7 @@ def usuario():
             
         usuario = data['usuario']
         cedula_usuario = data['cedula']
+        hashed_contraseña = bcrypt.hashpw(data['contraseña'].encode('utf-8'), bcrypt.gensalt())
 
         if accion == 'guardar':
             data_usuario = dataQuery.validarUsuario(opcion=1,data=usuario)['data']
@@ -96,7 +101,7 @@ def usuario():
                 flash('Ya existe un usuario con esa cedula')
                 return redirect(url_for('usuario'))  
             
-            data_insert = [data['usuario'],data['cedula'],data['telefono'],data['correo'],data['contraseña']]
+            data_insert = [data['usuario'],data['cedula'],data['telefono'],data['correo'],hashed_contraseña]
             insert_usuario = dataQuery.crearUsuario(data_insert)
             
             if insert_usuario == True:
@@ -126,7 +131,7 @@ def usuario():
         
         elif accion == 'actualizar':
             data_original = json.loads(data['datosOriginales'])
-            parametros = (data['usuario'], data['cedula'], data['telefono'], data['correo'], data['contraseña'], data_original['usuario'], data_original['cedula'])
+            parametros = (data['usuario'], data['cedula'], data['telefono'], data['correo'], hashed_contraseña, data_original['usuario'], data_original['cedula'])
             
             actualizar_usuario = dataQuery.actualizarUsuario(parametros)
             
@@ -142,7 +147,7 @@ def usuario():
                                     cedula=data['cedula'],
                                     telefono=data['telefono'],
                                     correo=data['correo'],
-                                    contraseña=data['contraseña']
+                                    contraseña=hashed_contraseña
                                     )
         else:
             print("No se reconoció la acción")

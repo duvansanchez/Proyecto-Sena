@@ -54,10 +54,16 @@ class DataAccess:
 
     def validarLogin(self,data):
         query = self.db.validadores['validarLogin']
-        resultado = self.db.select(query,data)[0][0]
+        resultado = self.db.select(query,data)[0]
 
-        if len(resultado) > 0:
-            return True
+        if len(resultado) > 1:
+            return {
+            "usuario": resultado[0],
+            "cedula": resultado[1],
+            "telefono": resultado[2],
+            "correo": resultado[3],
+            "contraseña": resultado[4]
+            }
         else:
             return False
     

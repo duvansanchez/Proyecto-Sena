@@ -129,11 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 //Citas
-document.getElementById('fecha_citas').addEventListener('change', function() {
-  if (this.value) {
+const fechaCitas = document.getElementById('fecha_citas');
+if (fechaCitas) {
+  fechaCitas.addEventListener('change', function() {
+    if (this.value) {
       document.getElementById('formCitas').submit();
-  }
-});
+    }
+  });
+}
+
 window.validarContenido = validarContenido;
 window.ocultarError = ocultarError;
 window.logicaBotones = logicaBotones;

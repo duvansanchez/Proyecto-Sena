@@ -20,7 +20,7 @@ class DataBase:
             "validarUsuarioId":"SELECT TOP 1 cedula FROM usuarios where cedula = ?",
             "validarMedico":"SELECT TOP 1 cedula FROM medicos where cedula = ?",
             "validarMedicoUser":"SELECT TOP 1 usuario FROM medicos where usuario = ?",
-            "validarLogin":"SELECT TOP 1 usuario FROM usuarios where usuario = ? and contraseña = ?",
+            "validarLogin":"SELECT TOP 1 * FROM usuarios where usuario = ?",
             "validarHorario":"SELECT TOP 1 cedula,dia FROM Horarios_Medicos WHERE cedula = ? and dia = ?"
         }
    
