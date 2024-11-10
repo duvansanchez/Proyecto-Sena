@@ -330,9 +330,9 @@ def medicos():
         
     return render_template('medicos.html', lista_de_campos=lista_de_campos, recomendaciones=recomendaciones, usuario_login=usuario_login, data=data)
 
-@app.route('/salas', methods=['GET','POST'])
-@login_required
-def salas():
+# @app.route('/salas', methods=['GET','POST'])
+# @login_required
+# def salas():
     usuario_login = session.get('usuario')
 
     if request.method == 'POST':
@@ -347,7 +347,7 @@ def salas():
 # Ruta para renderizar la plantilla con las citas
 @app.route('/citas', methods=['GET','POST'])
 @login_required
-def citas_medicas():
+def citas():
     usuario_login = session.get('usuario')
     citas = [{
                 'id': '',
@@ -369,11 +369,10 @@ def citas_medicas():
             
         fecha_citas = data['fecha_citas']
         buscar_citas = dataQuery.busquedaCitas(fecha_citas)['result-busqueda']
-                
+        print(f"buscar_citas {buscar_citas[0]}")
         citas = []
 
-        if buscar_citas[0] == '':
-            flash('No existen citas en esa fecha')
+        if buscar_citas[0][0] == '':
             return redirect(url_for('citas'))
         else:
             for cita in buscar_citas:
@@ -384,8 +383,7 @@ def citas_medicas():
                     'nombre_paciente': cita[3],
                     'medico': cita[4],
                     'nombre_medico': cita[5],
-                    'sala': cita[6],
-                    'especialidad':cita[7]
+                    'especialidad': cita[6]
                 }
                 citas.append(paciente_cita)
                     
@@ -478,6 +476,7 @@ def crearcitas():
 # Ruta para renderizar la plantilla con las citas
 @app.route('/crearhorarios', methods=['GET','POST'])
 @login_required
+#FIXME NO ESTAN ELIMINANDO LOS HORARIOS
 def crearhorarios():
     usuario_login = session.get('usuario')
 
@@ -502,36 +501,58 @@ def crearhorarios():
         horarios_medicos = dataQuery.estructurarHorarios(query_horarios_medicos)
 
     if request.method == 'POST':
-        horarios = request.form.getlist('horarios[]')  # Recibe todos los inputs con el name 'horarios[]'
+        horarios = request.form.getlist('horarios[]')  
         print(f'Horarios encontrados {horarios}')
         
         horarios_decodificados = [json.loads(horario) for horario in horarios][0]
         print(f'Horarios decodificados {horarios_decodificados}')
 
+        #Si el medico no tiene horarios decodificados entonces vaciar todos los horarios
+        if horarios_decodificados == []:
+            flash('El medico tiene que tener minimo un dia de horario creado')
+            return redirect(url_for('crearhorarios'))   
+        
+        #TODO PROBAR CUANDO NO HAYA NINGUN HORARIO
+        cont_elim = 0
         for horario in horarios_decodificados:
-            parametros_validacion = [horario['cedula'],horario['dia']]
-            validar_horario = dataQuery.validarHorarios(parametros_validacion)['data'][0]
             nuevo_horario = [horario['dia'], horario['inicio'], horario['fin'], horario['medico'], horario['cedula']]
             
-            # Validar si ya tiene un horario creado
-            if validar_horario != '':
-                eliminar_horario = dataQuery.eliminarHorario([horario['cedula'],horario['dia']])
-                insert_horario = dataQuery.crearHorario(nuevo_horario)
-                if insert_horario:
-                    flash('Horario creado con exito')
-                    return redirect(url_for('crearhorarios'))   
-                else:
-                    flash('No se pudo crear el horario')
-                    return redirect(url_for('crearhorarios'))                                       
+            cont_elim += 1
+            if cont_elim <= 1:
+                eliminar_horario = dataQuery.eliminarHorario([horario['cedula']])
+            
+            insert_horario = dataQuery.crearHorario(nuevo_horario)
+            if not insert_horario:
+                flash('No se pudo crear el horario')
+                return redirect(url_for('crearhorarios'))   
+           
+            # if insert_horario:
+            #     flash('Horario creado con exito')
+            #     return redirect(url_for('crearhorarios'))   
+            # else:
+            #     flash('No se pudo crear el horario')
+            #     return redirect(url_for('crearhorarios'))  
 
-            else:
-                insert_horario = dataQuery.crearHorario(nuevo_horario)
-                if insert_horario:
-                    flash('Horario creado con exito')
-                    return redirect(url_for('crearhorarios'))   
-                else:
-                    flash('No se pudo crear el horario')
-                    return redirect(url_for('crearhorarios'))       
+            # # Validar si ya tiene un horario creado
+            # if validar_horario != '':
+            #     print("ELIMINANDO HORARIO")
+            #     eliminar_horario = dataQuery.eliminarHorario([horario['cedula'],horario['dia']])
+            #     insert_horario = dataQuery.crearHorario(nuevo_horario)
+            #     if insert_horario:
+            #         flash('Horario creado con exito')
+            #         return redirect(url_for('crearhorarios'))   
+            #     else:
+            #         flash('No se pudo crear el horario')
+            #         return redirect(url_for('crearhorarios'))                                       
+
+            # else:
+            #     insert_horario = dataQuery.crearHorario(nuevo_horario)
+            #     if insert_horario:
+            #         flash('Horario creado con exito')
+            #         return redirect(url_for('crearhorarios'))   
+            #     else:
+            #         flash('No se pudo crear el horario')
+            #         return redirect(url_for('crearhorarios'))       
                  
         flash(f'Horarios medicos actualizados')
         return redirect(url_for('crearhorarios'))  

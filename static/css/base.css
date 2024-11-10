@@ -119,13 +119,14 @@ a:hover, a:active, a:focus {
     left: 10px; /* Espacio desde el lado izquierdo de la ventana */
     z-index: 10; /* Asegura que el mensaje esté por encima de otros elementos */
 }
-#error{
+#error {
+    display: none;
     float: right;
     max-width: 300px;
     background-color: rgb(0 23 76);
-    /* padding: 10px; */
+    padding: 10px;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 18px;
     margin-top: 5px;
 }
 #boton-cerrar {

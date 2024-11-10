@@ -54,7 +54,6 @@ function validarContenido(campos) {
   }
 }
 
-
 function ocultarError() {
   document.getElementById("error").style.display = "none"; 
   let botonCerrar = document.getElementById("boton-cerrar");
@@ -120,6 +119,15 @@ function recargarPagina(ruta) {
   window.location.href = `/${ruta}`;  
 }
 
+//EventListener
+document.addEventListener('DOMContentLoaded', () => {
+  const errorDiv = document.getElementById('error');
+  if (errorDiv && errorDiv.innerHTML.trim() !== '') { // Solo ejecuta si hay contenido
+      setTimeout(() => {
+          errorDiv.style.display = 'none';
+      }, 6000); // 6000 milisegundos = 6 segundos
+  }
+});
 
 window.validarContenido = validarContenido;
 window.ocultarError = ocultarError;

@@ -1,3 +1,5 @@
+{% import 'macros.html' as macro %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/citas.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/crearhorarios.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,32 +21,10 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <div class="errores">
-        <form action="/crearcitas" method="post" onsubmit="return ocultarError()" class="form-error">
-            <div class="error" id="error">
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                  <ul>
-                    {% for message in messages %}
-                      <li>{{ message }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-                {% endwith %} 
-            </div>
-            <button type="submit" id="boton-cerrar">X</button>  
-        </form>
-    </div> 
-    <div class="content-titulo">
-        <h1 class="titulo text-3xl font-bold text-center text-blue-600 mb-8">Gestión de Horarios Médicos</h1>
-        <p class="usuario-name">{{ usuario_login }}</p>
-        <span class="material-symbols-outlined" id="home">
-            cabin
-        </span>
-        <form action="/usuario"  method="post" class="salir-form" id="salir-form">
-            <button class="ingresar button-menu salir">Salir</button>
-        </form> 
-    </div>  
+    {{ macro.errores() }}
+
+    {{ macro.encabezado('Gestión de Horarios Médicos', usuario_login) }}
+
     <div class="container mx-auto px-4 py-8">        
         <div class="bg-white shadow-md rounded-lg overflow-hidden max-w-4xl mx-auto mb-8">
             <h2 class="color-main-text text-center text-xl font-bold p-4 bg-blue-50 text-blue-700">Configurar Horario</h2>

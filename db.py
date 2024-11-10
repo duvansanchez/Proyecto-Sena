@@ -32,7 +32,7 @@ class DataBase:
             "busqueda_usuario":"SELECT * FROM usuarios WHERE usuario = ? or cedula = ?",
             "busqueda_medico":"SELECT * FROM medicos WHERE nombre = ? or cedula = ?",
             "busqueda_paciente":"SELECT * FROM pacientes WHERE tipo_identificacion = ? and cedula = ?",
-            "busqueda_citas":"SELECT c1.fecha,c1.hora_llegada,c1.codigo_paciente,c1.nombre_paciente,c1.medico,c1.nombre_medico,c1.salas,m1.especialidad FROM citas c1 INNER JOIN medicos m1 on c1.medico = m1.cedula WHERE c1.fecha = ?"
+            "busqueda_citas":"SELECT c1.fecha,c1.hora_llegada,c1.codigo_paciente,c1.nombre_paciente,c1.medico,c1.nombre_medico,m1.especialidad FROM citas c1 INNER JOIN medicos m1 on c1.medico = m1.cedula WHERE c1.fecha = ?"
         }
         self.actualizar = {
             "actualizar_usuario": "UPDATE [dbo].[Usuarios] SET [usuario] = ?, [cedula] = ?, [telefono] = ?, [correo] = ?, [contraseña] = ? WHERE usuario = ? and cedula = ?",
@@ -42,7 +42,7 @@ class DataBase:
             "actualizar_paciente":"UPDATE [dbo].[Pacientes] SET [nombre] = ?, [apellidos] = ?, [nacimiento] = ?, [tipo_identificacion] = ?, [cedula] = ?, [telefono] = ?, [genero] = ?, [nacionalidad] = ?, [direccion] = ?, [correo] = ? WHERE tipo_identificacion = ? and cedula = ?"
         }
         self.deletes = {
-            "deleteHorarios":"DELETE FROM Horarios_Medicos WHERE cedula = ? and dia = ?"
+            "deleteHorarios":"DELETE FROM Horarios_Medicos WHERE cedula = ?"
         }
    
     def conexiondb(self):
@@ -105,7 +105,7 @@ class DataBase:
                 return resultados
         except Exception as e:
             print(f"Error al consultar datos: {e}")
-
+            return False
         finally:
             # Cerrar el cursor y la conexión siempre, independientemente de si hubo un error
             cursor.close()
