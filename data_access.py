@@ -197,9 +197,6 @@ class DataAccess:
         })
 
         for fila in resultado_query:
-            # Verificar si la fila tiene 8 o 7 valores
-            print(f"Fila: {fila}")
-
             if len(fila) == 8:
                 cedula, nombre_medico, especialidad, dia, inicio, fin, fecha, hora_llegada = fila
             elif len(fila) == 7:
