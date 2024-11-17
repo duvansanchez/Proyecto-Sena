@@ -1,5 +1,6 @@
 from collections import defaultdict
 from db import DataBase
+from datetime import date
 
 class DataAccess:
     def __init__(self):
@@ -93,13 +94,18 @@ class DataAccess:
     
     def tipocc(self):
         query =  self.db.consultas['tipocc']
-        generos = self.db.select(query)
-        return generos
+        tipocc = self.db.select(query)
+        print(f"Tipo cc: {tipocc}")
+        return tipocc
     
     def doctors(self):
         query = self.db.consultas['doctors']
         doctors = self.db.select(query)
         return doctors
+
+    def fechaHoy(self):
+        fecha_hoy = date.today()
+        return fecha_hoy.strftime("%Y-%m-%d")  
 
 # Busquedas
     def busquedaUsuario(self,data):
@@ -192,12 +198,15 @@ class DataAccess:
 
         for fila in resultado_query:
             # Verificar si la fila tiene 8 o 7 valores
+            print(f"Fila: {fila}")
+
             if len(fila) == 8:
                 cedula, nombre_medico, especialidad, dia, inicio, fin, fecha, hora_llegada = fila
             elif len(fila) == 7:
                 cedula, nombre_medico, especialidad, dia, inicio, fin, fecha = fila
                 hora_llegada = None
             else:
+                print(f"Fila: {fila}")
                 raise ValueError("La fila no tiene el número correcto de columnas.")
             
             # Si este médico ya existe en el diccionario, solo agregamos horarios y citas

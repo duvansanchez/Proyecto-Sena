@@ -90,7 +90,7 @@
     <script>
         const especialidades = {{ especialidades|tojson|safe }};
         const medicos = {{ medicos|tojson|safe }};
-        let horariosDoctores  = {{ horarios_medicos|tojson|safe }};
+        let horariosDoctores = {{ horarios_medicos|tojson|safe }} || [];
     </script>
 </body>
 </html>

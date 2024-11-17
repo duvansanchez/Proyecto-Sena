@@ -16,6 +16,9 @@
 </head>
 <body class="bg-gray-100">
     <div class="flex h-screen">
+        <form action="/login"  method="post" class="salir-form" id="salir-form">
+            <button class="ingresar button-menu salir">Salir</button>
+        </form> 
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow-lg">
             <nav class="mt-5 px-2">
@@ -128,15 +131,15 @@
                     <h2 class="text-xl font-semibold mb-5">Resumen del Sistema</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="text-center">
-                            <div class="color-main-text text-2xl font-bold">150</div>
+                            <div class="color-main-text text-2xl font-bold">{{citas_hoy}}</div>
                             <div class="text-gray-600 text-sm">Citas Hoy</div>
                         </div>
                         <div class="text-center">
-                            <div class="color-main-text text-2xl font-bold">25</div>
+                            <div class="color-main-text text-2xl font-bold">{{total_medicos}}</div>
                             <div class="text-gray-600 text-sm">Médicos</div>
                         </div>
                         <div class="text-center">
-                            <div class="color-main-text text-2xl font-bold">1.2k</div>
+                            <div class="color-main-text text-2xl font-bold">{{total_pacientes}}</div>
                             <div class="text-gray-600 text-sm">Pacientes</div>
                         </div>
 

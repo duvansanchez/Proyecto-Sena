@@ -1,6 +1,6 @@
 {% macro errores() %}
     <div class="errores">
-        <form action="/crearcitas" method="post" onsubmit="return ocultarError()" class="form-error">
+        <form action="/" method="post" onsubmit="return ocultarError()" class="form-error">
             <div class="error" id="error">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}

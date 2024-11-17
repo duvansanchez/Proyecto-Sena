@@ -64,10 +64,15 @@ function generarHorarioGrilla() {
     const horarioItem = document.createElement("div");
     horarioItem.className =
       "bg-gray-100 p-2 rounded flex justify-between items-center";
-    horarioItem.innerHTML = `
-                    <span>${horario.dia}: ${horario.inicio} - ${horario.fin}</span>
-                    <button class="text-red-500 hover:text-red-700" onclick="removerHorario('${horario.dia}', '${horario.inicio}', '${horario.fin}', this)">Eliminar</button>
-                `;
+    horarioItem.innerHTML = `<span>${horario.dia}: ${horario.inicio} - ${horario.fin}</span>
+    <button class="text-red-500 hover:text-red-700">Eliminar</button>`;
+
+    const button = horarioItem.querySelector('button');
+
+    button.addEventListener('click', () => {
+    removerHorario(horario.dia, horario.inicio, horario.fin, button);
+    });
+
     horarioLista.appendChild(horarioItem);
   });
   inputHidden.value = JSON.stringify(horarioMedicoElegido);

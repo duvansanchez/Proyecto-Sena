@@ -50,7 +50,7 @@ def login():
             if bcrypt.checkpw(contraseña, hashed_contraseña.encode('utf-8')):
                 print('Credenciales correctas')
                 session['usuario'] = usuario  # Almacena el nombre de usuario en la sesión
-                return redirect(url_for('usuario'))
+                return redirect(url_for('home'))
             else:
                 flash('Credenciales incorrectas')
         else:
@@ -60,13 +60,18 @@ def login():
         
     return render_template('login.html')
 
-
 @app.route('/home', methods=['GET','POST'])
 @login_required
 def home():
     usuario_login = session.get('usuario')
+    fecha_hoy = dataQuery.fechaHoy()
+    citas_hoy = db.select("SELECT COUNT(*) FROM Citas WHERE fecha = ?",fecha_hoy)[0][0]
+    total_medicos =  db.select("SELECT COUNT(*) FROM Medicos")[0][0]
+    total_pacientes =  db.select("SELECT COUNT(*) FROM Pacientes")[0][0]
 
-    response = make_response(render_template('home.html', usuario_login=usuario_login))
+    
+
+    response = make_response(render_template('home.html', usuario_login=usuario_login, citas_hoy=citas_hoy, total_medicos=total_medicos, total_pacientes=total_pacientes))
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     return response
@@ -157,7 +162,6 @@ def usuario():
     response.headers['Pragma'] = 'no-cache'
     return response
 
-# TODO PARA QUE CARGUEN LOS TIPOS DE CC
 @app.route('/pacientes', methods=['GET','POST'])
 @login_required
 def pacientes():
@@ -253,9 +257,9 @@ def pacientes():
     response.headers['Pragma'] = 'no-cache'
     return response    
 
+#TODO VALIDACION PARA QUE VERIFIQUE SI EXISTE EL USUARIO
 @app.route('/medicos', methods=['GET','POST'])
 @login_required
-# TODO PARA QUE CARGUEN LOS TIPOS DE CC
 def medicos():
     usuario_login = session.get('usuario')
 
@@ -430,7 +434,7 @@ def citas():
 def crearcitas():
     usuario_login = session.get('usuario')
     
-    query_citas= db.select("SELECT me.cedula, CONCAT(me.nombre,' ',me.apellidos) nombre,me.especialidad, ho.dia, ho.inicio, ho.fin, ci.fecha, ci.hora_llegada FROM Medicos me INNER JOIN Horarios_Medicos ho ON ho.cedula = me.cedula INNER JOIN Citas ci on ci.medico = me.cedula")
+    query_citas= db.select("SELECT me.cedula, CONCAT(me.nombre,' ',me.apellidos) nombre,me.especialidad, ho.dia, ho.inicio, ho.fin, ci.fecha, ci.hora_llegada FROM Medicos me INNER JOIN Horarios_Medicos ho ON ho.cedula = me.cedula LEFT JOIN Citas ci on ci.medico = me.cedula")
     citas_medicos = dataQuery.estructurarMedicos(query_citas)
     
     query_especialidades = db.select("SELECT especialidad FROM Especialidades")

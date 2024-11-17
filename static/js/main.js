@@ -95,8 +95,6 @@ function logicaBotones(button){
         });
 
         document.getElementById("datosOriginales").value = JSON.stringify(valoresOriginales);
-        console.log(`Valores originales guardados: ${JSON.stringify(valoresOriginales)}`);
-    
       }  
 
     if (button == 'xe'){

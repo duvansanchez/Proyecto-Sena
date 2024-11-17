@@ -9,10 +9,6 @@ class DataBase:
             "crear_cita":"INSERT INTO [dbo].[Citas] ([fecha], [hora_llegada], [codigo_paciente], [nombre_paciente], [medico], [nombre_medico]) VALUES (?, ?, ?, ?, ?, ?);",
             "crear_horario":"INSERT INTO [dbo].[Horarios_Medicos] ([dia], [inicio], [fin], [medico], [cedula]) VALUES (?, ?, ?, ?, ?);"
         }
-
-        self.updates = {
-            "result-status":"EXECUTE dbo.[updateBtts] @date_match=?,@name_main=?,@name_second=?,@possesion_m=?,@possesion_s=?,@shots_m=?,@shots_s=?,@xg_m=?,@xg_s=?,@result_ht=?,@result=?,@success=?"
-        }
         
         self.validadores = {
             "validarPaciente":"SELECT TOP 1 cedula FROM pacientes where cedula = ?",
@@ -48,10 +44,10 @@ class DataBase:
    
     def conexiondb(self):
         # Crear variables de entorno
-        server = 'DESKTOP-T71IG1E' 
+        server = 'DESKTOP-1R7IBR7' 
         database = 'PROYECTO SENA'
         username = 'sa'
-        password = 'Infotec123'
+        password = 'Duvan123'
 
         # Crea la cadena de conexión
         try:
