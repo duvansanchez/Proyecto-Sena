@@ -400,7 +400,6 @@ def citas():
             
         fecha_citas = data['fecha_citas']
         buscar_citas = dataQuery.busquedaCitas(fecha_citas)['result-busqueda']
-        print(f"buscar_citas {buscar_citas[0]}")
         citas = []
 
         if buscar_citas[0][0] == '':

@@ -125,7 +125,7 @@ function mostrarCalendarioMedico(medicoCedula, fechaInicioSemana = new Date()) {
         cell.className = "calendar-cell";
 
         const diaSemana = semana[i];
-        const fechaString = diaSemana.toISOString().split("T")[0]; //2024-11-06
+        const fechaString = diaSemana.toISOString().split("T")[0]; 
 
         const horasDelDia = horasTrabajo[diaSemana.getDay()] || [];
 
@@ -178,9 +178,7 @@ function mostrarCalendarioMedico(medicoCedula, fechaInicioSemana = new Date()) {
 // Función para manejar la selección de una hora
 function seleccionarHora(fecha, hora, cell) {
   // Limpiar selección previa
-  document
-    .querySelectorAll(".calendar-cell.selected")
-    .forEach((c) => c.classList.remove("selected"));
+  document.querySelectorAll(".calendar-cell.selected").forEach((c) => c.classList.remove("selected"));
   // Marcar la celda seleccionada
   cell.classList.add("selected");
   // Actualizar campos del formulario
